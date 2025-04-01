@@ -45,14 +45,14 @@ const TrackingTimeline = ({ events }: TrackingTimelineProps) => {
             <div key={event.id} className="relative">
               {/* Connecting line */}
               {index < events.length - 1 && (
-                <div className="tracking-line top-10 bottom-0 left-[14px]"></div>
+                <div className="absolute w-0.5 bg-gray-200 top-10 bottom-0 left-[14px]"></div>
               )}
               
               <div className="flex items-start gap-4">
                 <div className={cn(
-                  "tracking-dot flex items-center justify-center mt-1",
-                  event.isCurrentEvent && "tracking-animation bg-delivery-500",
-                  event.isCompleted ? "bg-delivery-500" : "bg-gray-300"
+                  "w-7 h-7 rounded-full flex items-center justify-center mt-1",
+                  event.isCurrentEvent && "bg-blue-500 animate-pulse",
+                  event.isCompleted ? "bg-green-500" : "bg-gray-300"
                 )}>
                   {event.isCompleted && (
                     <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
@@ -61,17 +61,17 @@ const TrackingTimeline = ({ events }: TrackingTimelineProps) => {
                 
                 <div className={cn(
                   "w-full rounded-lg p-3",
-                  event.isCurrentEvent && "bg-delivery-50",
+                  event.isCurrentEvent && "bg-blue-50",
                   !event.isCurrentEvent && "hover:bg-gray-50 transition-colors"
                 )}>
                   <div className="flex justify-between mb-1">
                     <h4 className={cn(
                       "font-medium flex items-center gap-2",
-                      event.isCurrentEvent && "text-delivery-700"
+                      event.isCurrentEvent && "text-blue-700"
                     )}>
                       <StatusIcon className={cn(
                         "h-4 w-4",
-                        event.isCurrentEvent ? "text-delivery-500" : "text-gray-500"
+                        event.isCurrentEvent ? "text-blue-500" : "text-gray-500"
                       )} />
                       {event.status}
                     </h4>

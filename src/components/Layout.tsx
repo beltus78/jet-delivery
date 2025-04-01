@@ -11,6 +11,35 @@ const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      
+      <style jsx global>{`
+        .tracking-dot {
+          width: 28px;
+          height: 28px;
+          border-radius: 9999px;
+          z-index: 10;
+        }
+        
+        .tracking-line {
+          position: absolute;
+          width: 1px;
+          background-color: #e5e7eb;
+          z-index: 5;
+        }
+        
+        .tracking-animation {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+      `}</style>
     </div>
   );
 };
