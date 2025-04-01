@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, Share2, AlertTriangle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import TrackingOverview from "@/components/TrackingOverview";
 import TrackingMap from "@/components/TrackingMap";
@@ -22,6 +23,7 @@ const TrackingDetailsPage = () => {
   const [trackingDetails, setTrackingDetails] = useState<TrackingDetailsType | null>(null);
   const [trackingEvents, setTrackingEvents] = useState<TrackingEvent[]>([]);
   const [mapData, setMapData] = useState<any>(null);
+  const [weatherAlert, setWeatherAlert] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTrackingData = async () => {
@@ -36,6 +38,11 @@ const TrackingDetailsPage = () => {
         setTrackingDetails(details);
         setTrackingEvents(events);
         setMapData(map);
+        
+        // Simulate a weather delay alert for some packages
+        if (Math.random() > 0.7) {
+          setWeatherAlert("Potential weather delay: Heavy snow forecast in Denver area may affect delivery times.");
+        }
         
         toast.success("Tracking information loaded successfully");
       } catch (error) {
@@ -53,6 +60,27 @@ const TrackingDetailsPage = () => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "Package Tracking",
+        text: `Track my package with Swift Mail Service: ${trackingNumber}`,
+        url: window.location.href,
+      }).catch(err => {
+        console.error("Error sharing:", err);
+        navigator.clipboard.writeText(window.location.href);
+        toast.success("Tracking link copied to clipboard");
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Tracking link copied to clipboard");
+    }
+  };
+
+  const handleDownloadLabel = () => {
+    toast.success("Shipping label downloaded successfully");
   };
 
   return (
@@ -75,19 +103,58 @@ const TrackingDetailsPage = () => {
             {!loading && trackingDetails && (
               <p className="text-gray-500">
                 Tracking Number: <span className="font-medium">{trackingDetails.trackingNumber}</span>
+                {trackingDetails.priority === "express" && (
+                  <Badge className="ml-2 bg-amber-500" variant="default">Express</Badge>
+                )}
+                {trackingDetails.priority === "priority" && (
+                  <Badge className="ml-2 bg-red-500" variant="default">Priority</Badge>
+                )}
               </p>
             )}
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2 print:hidden" 
-            onClick={handlePrint}
-          >
-            <Printer className="h-4 w-4" />
-            <span>Print</span>
-          </Button>
+          
+          <div className="flex flex-wrap gap-2 print:hidden">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2" 
+              onClick={handleShare}
+            >
+              <Share2 className="h-4 w-4" />
+              <span>Share</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2" 
+              onClick={handleDownloadLabel}
+            >
+              <Download className="h-4 w-4" />
+              <span>Label</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2" 
+              onClick={handlePrint}
+            >
+              <Printer className="h-4 w-4" />
+              <span>Print</span>
+            </Button>
+          </div>
         </div>
+        
+        {weatherAlert && (
+          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="font-medium text-yellow-800">Weather Alert</h3>
+              <p className="text-yellow-700 text-sm">{weatherAlert}</p>
+            </div>
+          </div>
+        )}
         
         {loading ? (
           <div className="space-y-6">

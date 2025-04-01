@@ -2,6 +2,7 @@
 import { useState } from "react";
 import TrackingForm from "@/components/TrackingForm";
 import TrackingMap from "@/components/TrackingMap";
+import TrackingOverview from "@/components/TrackingOverview";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import TrackingTimeline from "@/components/TrackingTimeline";
@@ -62,6 +63,40 @@ const TrackPage = () => {
     },
   ];
 
+  // Sample tracking details for the overview
+  const sampleTrackingDetails = {
+    trackingNumber: "SMS123456789",
+    status: "In Transit",
+    estimatedDelivery: "Sep 17, 2023",
+    shippedDate: "Sep 15, 2023",
+    service: "Express Delivery",
+    weight: "3.5 lbs",
+    from: {
+      address: "16000 Dallas Pkwy # 400",
+      city: "Dallas",
+      state: "TX",
+      zip: "75248",
+      country: "United States",
+    },
+    to: {
+      name: "John Smith",
+      email: "john.smith@example.com",
+      phone: "(303) 555-1234",
+      address: "1234 Main St",
+      city: "Denver",
+      state: "CO",
+      zip: "80202",
+      country: "United States",
+    },
+    progress: 45,
+    isDelivered: false,
+    priority: "express",
+    itemCount: 2,
+    packageType: "Box",
+    signatureRequired: true,
+    specialInstructions: "Please leave with front desk if recipient is not available",
+  };
+
   const handleShowSample = () => {
     setShowSample(true);
     toast.info("Showing sample tracking map", {
@@ -92,7 +127,7 @@ const TrackPage = () => {
           
           {showSample && (
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">Sample Tracking Map</h2>
+              <h2 className="text-xl font-semibold mb-4">Sample Tracking Information</h2>
               <TrackingMap 
                 origin={sampleOrigin}
                 destination={sampleDestination}
@@ -100,32 +135,12 @@ const TrackPage = () => {
                 isDelivered={false}
               />
               
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 mb-6">
-                <h3 className="font-medium text-blue-800 mb-2">Package Status: In Transit</h3>
-                <p className="text-blue-700">
-                  Your package has left Dallas, TX and is currently in Amarillo, TX. 
-                  It is on its way to Denver, CO and is expected to arrive in 2 days.
-                </p>
-                <div className="mt-2 grid grid-cols-5 gap-1">
-                  <div className="col-span-2 h-2 bg-blue-500 rounded-l-full"></div>
-                  <div className="col-span-3 h-2 bg-gray-300 rounded-r-full"></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>Shipped</span>
-                  <span>In Transit</span>
-                  <span>Out for Delivery</span>
-                  <span>Delivered</span>
-                </div>
+              <div className="mt-6">
+                <TrackingOverview details={sampleTrackingDetails} />
               </div>
               
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-4">Tracking History</h3>
                 <TrackingTimeline events={sampleTrackingEvents} />
-              </div>
-              
-              <div className="flex gap-2 text-sm text-gray-600 italic">
-                <span className="font-medium">Estimated delivery:</span>
-                <span>Sep 17, 2023</span>
               </div>
             </div>
           )}

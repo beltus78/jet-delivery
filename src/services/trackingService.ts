@@ -124,6 +124,9 @@ const mockTrackingDetails: Record<string, TrackingDetailsType> = {
       country: "United States",
     },
     to: {
+      name: "John Smith",
+      email: "john.smith@example.com",
+      phone: "(303) 555-1234",
       address: "1234 Main St",
       city: "Denver",
       state: "CO",
@@ -132,6 +135,11 @@ const mockTrackingDetails: Record<string, TrackingDetailsType> = {
     },
     progress: 45,
     isDelivered: false,
+    priority: "express",
+    itemCount: 2,
+    packageType: "Box",
+    signatureRequired: true,
+    specialInstructions: "Please leave with front desk if recipient is not available",
   },
   "SMS987654321": {
     trackingNumber: "SMS987654321",
@@ -148,6 +156,9 @@ const mockTrackingDetails: Record<string, TrackingDetailsType> = {
       country: "United States",
     },
     to: {
+      name: "Emily Johnson",
+      email: "emily.johnson@example.com",
+      phone: "(303) 555-9876",
       address: "5678 Oak Ave",
       city: "Denver",
       state: "CO",
@@ -156,8 +167,26 @@ const mockTrackingDetails: Record<string, TrackingDetailsType> = {
     },
     progress: 100,
     isDelivered: true,
+    priority: "standard",
+    itemCount: 1,
+    packageType: "Envelope",
+    signatureRequired: false,
   },
 };
+
+// Names and email domains for random generation
+const firstNames = ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth'];
+const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+const emailDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'example.com'];
+const packageTypes = ['Box', 'Envelope', 'Tube', 'Pallet', 'Crate', 'Parcel'];
+const specialInstructions = [
+  "Please leave with neighbor if not home",
+  "Call recipient before delivery",
+  "Place package at back door",
+  "Signature required - no exceptions",
+  "Fragile - handle with care",
+  "Do not leave unattended"
+];
 
 // Function to get tracking details
 export const getTrackingDetails = (trackingNumber: string): Promise<TrackingDetailsType> => {
@@ -169,6 +198,16 @@ export const getTrackingDetails = (trackingNumber: string): Promise<TrackingDeta
       } else {
         // If tracking number doesn't exist in our mock data, create a random one
         const isDelivered = Math.random() > 0.5;
+        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const emailDomain = emailDomains[Math.floor(Math.random() * emailDomains.length)];
+        const packageType = packageTypes[Math.floor(Math.random() * packageTypes.length)];
+        const hasSpecialInstructions = Math.random() > 0.7;
+        const priorityOptions = ["standard", "express", "priority"] as const;
+        const priority = priorityOptions[Math.floor(Math.random() * priorityOptions.length)];
+        const signatureRequired = Math.random() > 0.5;
+        const itemCount = Math.floor(Math.random() * 5) + 1;
+        
         const newDetails: TrackingDetailsType = {
           trackingNumber,
           status: isDelivered ? "Delivered" : "In Transit",
@@ -184,6 +223,9 @@ export const getTrackingDetails = (trackingNumber: string): Promise<TrackingDeta
             country: "United States",
           },
           to: {
+            name: `${firstName} ${lastName}`,
+            email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
+            phone: `(${Math.floor(Math.random() * 800) + 200}) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
             address: `${Math.floor(1000 + Math.random() * 8999)} ${["Main St", "Broadway", "Oak Ave", "Elm St"][Math.floor(Math.random() * 4)]}`,
             city: "Denver",
             state: "CO",
@@ -192,6 +234,13 @@ export const getTrackingDetails = (trackingNumber: string): Promise<TrackingDeta
           },
           progress: isDelivered ? 100 : Math.floor(Math.random() * 80) + 10,
           isDelivered,
+          priority,
+          itemCount,
+          packageType,
+          signatureRequired,
+          ...(hasSpecialInstructions && {
+            specialInstructions: specialInstructions[Math.floor(Math.random() * specialInstructions.length)]
+          })
         };
         resolve(newDetails);
       }

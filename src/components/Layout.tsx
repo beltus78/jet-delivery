@@ -12,7 +12,7 @@ const Layout = () => {
       </main>
       <Footer />
       
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .tracking-dot {
           width: 28px;
           height: 28px;
@@ -39,7 +39,7 @@ const Layout = () => {
             opacity: 0.5;
           }
         }
-      `}</style>
+      `}} />
     </div>
   );
 };
