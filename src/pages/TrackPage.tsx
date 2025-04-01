@@ -63,7 +63,7 @@ const TrackPage = () => {
     },
   ];
 
-  // Sample tracking details for the overview
+  // Sample tracking details for the overview - fixing the TS error by using the correct priority type
   const sampleTrackingDetails = {
     trackingNumber: "SMS123456789",
     status: "In Transit",
@@ -90,7 +90,7 @@ const TrackPage = () => {
     },
     progress: 45,
     isDelivered: false,
-    priority: "express",
+    priority: "express" as const, // Fixed the type error by using 'as const'
     itemCount: 2,
     packageType: "Box",
     signatureRequired: true,
