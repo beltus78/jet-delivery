@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Users, 
@@ -13,7 +14,9 @@ import {
   MapPin,
   CreditCard,
   Package,
-  Calendar
+  Calendar,
+  X,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
