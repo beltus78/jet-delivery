@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Users, 
@@ -138,7 +137,7 @@ const CustomersPage = () => {
       customer.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       customer.address.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesStatusFilter = !filterStatus || customer.status === filterStatus;
+    const matchesStatusFilter = !filterStatus || filterStatus === "all" || customer.status === filterStatus;
     
     return matchesSearch && matchesStatusFilter;
   });
@@ -380,7 +379,7 @@ const CustomersPage = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Inactive">Inactive</SelectItem>
               </SelectContent>
