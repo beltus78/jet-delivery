@@ -1,8 +1,8 @@
 
-import { FormEvent, useState } from "react";
-import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Search } from 'lucide-react';
 
 export interface TrackingFormProps {
   onSubmit: (trackingNumber: string) => void;
@@ -10,10 +10,14 @@ export interface TrackingFormProps {
   className?: string;
 }
 
-const TrackingForm = ({ onSubmit, onHomepage, className }: TrackingFormProps) => {
-  const [trackingNumber, setTrackingNumber] = useState("");
+const TrackingForm: React.FC<TrackingFormProps> = ({
+  onSubmit,
+  onHomepage = false,
+  className = ''
+}) => {
+  const [trackingNumber, setTrackingNumber] = React.useState('');
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (trackingNumber.trim()) {
       onSubmit(trackingNumber);
@@ -21,25 +25,28 @@ const TrackingForm = ({ onSubmit, onHomepage, className }: TrackingFormProps) =>
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`w-full ${className || ""}`}>
-      <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
-          </div>
-          <Input
-            type="text"
-            value={trackingNumber}
-            onChange={(e) => setTrackingNumber(e.target.value)}
-            placeholder="Enter your tracking number"
-            className="pl-10 w-full"
-            required
-          />
+    <form
+      onSubmit={handleSubmit}
+      className={`flex flex-col sm:flex-row gap-2 ${className}`}
+    >
+      <div className="relative flex-1">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <Search className="h-4 w-4 text-gray-400" />
         </div>
-        <Button type="submit" className="bg-swift-700 hover:bg-swift-800">
-          Track Package
-        </Button>
+        <Input
+          type="text"
+          placeholder="Enter your tracking number"
+          className={`pl-10 ${onHomepage ? 'h-12' : ''}`}
+          value={trackingNumber}
+          onChange={(e) => setTrackingNumber(e.target.value)}
+        />
       </div>
+      <Button 
+        type="submit" 
+        className={`bg-swift-600 hover:bg-swift-700 ${onHomepage ? 'h-12 px-8' : ''}`}
+      >
+        {onHomepage ? 'Track Package' : 'Track'}
+      </Button>
     </form>
   );
 };

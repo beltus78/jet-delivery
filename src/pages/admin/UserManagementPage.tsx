@@ -158,8 +158,8 @@ const UserManagementPage = () => {
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesRoleFilter = !filterRole || user.role === filterRole;
-    const matchesStatusFilter = !filterStatus || user.status === filterStatus;
+    const matchesRoleFilter = !filterRole || filterRole === "all" || user.role === filterRole;
+    const matchesStatusFilter = !filterStatus || filterStatus === "all" || user.status === filterStatus;
     
     return matchesSearch && matchesRoleFilter && matchesStatusFilter;
   });
@@ -435,7 +435,7 @@ const UserManagementPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Roles</SelectItem>
+                  <SelectItem value="all">All Roles</SelectItem>
                   {roles.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
@@ -454,7 +454,7 @@ const UserManagementPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
                 </SelectContent>
