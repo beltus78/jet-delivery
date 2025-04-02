@@ -1,29 +1,29 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { 
   Users, 
   Search, 
-  ArrowRight, 
-  UserPlus, 
-  Package, 
-  Mail, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Download, 
+  Filter,
+  User,
+  Mail,
   Phone,
   MapPin,
-  UserCheck,
-  Clock,
-  Filter
+  CreditCard,
+  Package,
+  Calendar
 } from "lucide-react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -33,546 +33,553 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 // Sample customer data
-const sampleCustomers = [
+const initialCustomers = [
   {
-    id: "CUS001",
+    id: 1,
     name: "John Smith",
     email: "john.smith@example.com",
-    phone: "(303) 555-1234",
-    address: "1234 Main St, Denver, CO 80202",
-    totalOrders: 8,
-    lastOrder: "2023-09-14",
-    status: "active",
-    type: "business",
-    joined: "2022-05-10"
-  },
-  {
-    id: "CUS002",
-    name: "Emily Johnson",
-    email: "emily.johnson@example.com",
-    phone: "(312) 555-5678",
-    address: "5678 Oak Ave, Chicago, IL 60611",
-    totalOrders: 5,
-    lastOrder: "2023-09-10",
-    status: "active",
-    type: "personal",
-    joined: "2022-07-22"
-  },
-  {
-    id: "CUS003",
-    name: "Robert Williams",
-    email: "robert.williams@example.com",
-    phone: "(305) 555-9876",
-    address: "9876 Palm Blvd, Miami, FL 33139",
-    totalOrders: 2,
-    lastOrder: "2023-09-05",
-    status: "inactive",
-    type: "personal",
-    joined: "2023-01-15"
-  },
-  {
-    id: "CUS004",
-    name: "Sarah Davis",
-    email: "sarah.davis@example.com",
-    phone: "(213) 555-4321",
-    address: "4321 Sunset Dr, Los Angeles, CA 90210",
-    totalOrders: 12,
+    phone: "123-456-7890",
+    address: "123 Main St, Anytown",
+    orders: 15,
     lastOrder: "2023-09-15",
-    status: "active",
-    type: "business",
-    joined: "2021-11-08"
+    status: "Active",
   },
   {
-    id: "CUS005",
+    id: 2,
+    name: "Emily Johnson",
+    email: "emily.j@example.com",
+    phone: "987-654-3210",
+    address: "456 Elm St, Anytown",
+    orders: 8,
+    lastOrder: "2023-09-10",
+    status: "Active",
+  },
+  {
+    id: 3,
+    name: "Robert Williams",
+    email: "robert.w@example.com",
+    phone: "555-123-4567",
+    address: "789 Oak St, Anytown",
+    orders: 22,
+    lastOrder: "2023-09-01",
+    status: "Inactive",
+  },
+  {
+    id: 4,
+    name: "Sarah Davis",
+    email: "sarah.d@example.com",
+    phone: "111-222-3333",
+    address: "101 Pine St, Anytown",
+    orders: 5,
+    lastOrder: "2023-08-20",
+    status: "Active",
+  },
+  {
+    id: 5,
     name: "Michael Brown",
-    email: "michael.brown@example.com",
-    phone: "(206) 555-8765",
-    address: "8765 Pine St, Seattle, WA 98101",
-    totalOrders: 3,
-    lastOrder: "2023-08-28",
-    status: "active",
-    type: "personal",
-    joined: "2022-12-03"
+    email: "michael.b@example.com",
+    phone: "444-555-6666",
+    address: "222 Cedar St, Anytown",
+    orders: 12,
+    lastOrder: "2023-09-05",
+    status: "Active",
   },
-  {
-    id: "CUS006",
-    name: "Acme Corporation",
-    email: "shipping@acmecorp.com",
-    phone: "(415) 555-7890",
-    address: "7890 Market St, San Francisco, CA 94103",
-    totalOrders: 24,
-    lastOrder: "2023-09-16",
-    status: "active",
-    type: "business",
-    joined: "2021-06-17"
-  }
 ];
 
 const CustomersPage = () => {
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [customers, setCustomers] = useState(sampleCustomers);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  
-  // New customer form state
+  const [customers, setCustomers] = useState(initialCustomers);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string | undefined>(undefined);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [currentCustomer, setCurrentCustomer] = useState<any>(null);
   const [newCustomer, setNewCustomer] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
-    city: "",
-    state: "",
-    zip: "",
-    type: "personal"
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Filter customers based on search query and filters
+  const filteredCustomers = customers.filter((customer) => {
+    const matchesSearch =
+      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.address.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatusFilter = !filterStatus || customer.status === filterStatus;
+    
+    return matchesSearch && matchesStatusFilter;
+  });
+
+  // Handle form input changes for new customer
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewCustomer({
-      ...newCustomer,
-      [name]: value,
-    });
+    setNewCustomer((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
-    setNewCustomer({
-      ...newCustomer,
-      [name]: value,
-    });
-  };
-
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = 
-      customer.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchText.toLowerCase()) ||
-      customer.id.toLowerCase().includes(searchText.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || customer.status === statusFilter;
-    const matchesType = typeFilter === "all" || customer.type === typeFilter;
-    
-    return matchesSearch && matchesStatus && matchesType;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case "active":
-        return "bg-green-100 text-green-700";
-      case "inactive":
-        return "bg-gray-100 text-gray-700";
-      default:
-        return "bg-gray-100 text-gray-700";
+  // Handle adding a new customer
+  const handleAddCustomer = () => {
+    // Validate form
+    if (!newCustomer.name || !newCustomer.email || !newCustomer.phone || !newCustomer.address) {
+      toast.error("Please fill in all required fields");
+      return;
     }
-  };
 
-  const getTypeColor = (type: string) => {
-    switch(type) {
-      case "business":
-        return "bg-blue-100 text-blue-700";
-      case "personal":
-        return "bg-purple-100 text-purple-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  const handleAddCustomer = (e: React.FormEvent) => {
-    e.preventDefault();
+    // Add new customer
+    const newId = Math.max(...customers.map((customer) => customer.id)) + 1;
     
-    // Create a new customer
-    const createdCustomer = {
-      id: `CUS${Math.floor(Math.random() * 900) + 100}`,
+    const customerToAdd = {
+      id: newId,
       name: newCustomer.name,
       email: newCustomer.email,
       phone: newCustomer.phone,
-      address: `${newCustomer.address}, ${newCustomer.city}, ${newCustomer.state} ${newCustomer.zip}`,
-      totalOrders: 0,
-      lastOrder: "-",
-      status: "active",
-      type: newCustomer.type,
-      joined: new Date().toISOString().split('T')[0]
+      address: newCustomer.address,
+      orders: 0,
+      lastOrder: new Date().toISOString().split('T')[0],
+      status: "Active",
     };
     
-    // Add to customers list
-    setCustomers([createdCustomer, ...customers]);
+    setCustomers([...customers, customerToAdd]);
+    toast.success(`Customer ${newCustomer.name} has been added successfully`);
     
-    // Close dialog and show success message
-    setShowAddDialog(false);
-    toast.success("Customer added successfully");
-    
-    // Reset form
+    // Reset form and close dialog
     setNewCustomer({
       name: "",
       email: "",
       phone: "",
       address: "",
-      city: "",
-      state: "",
-      zip: "",
-      type: "personal"
     });
+    
+    setIsAddDialogOpen(false);
+  };
+
+  // Handle editing a customer
+  const handleEditCustomer = () => {
+    if (!currentCustomer) return;
+    
+    // Update customer in the list
+    const updatedCustomers = customers.map((customer) =>
+      customer.id === currentCustomer.id ? currentCustomer : customer
+    );
+    
+    setCustomers(updatedCustomers);
+    toast.success(`Customer ${currentCustomer.name} has been updated successfully`);
+    setIsEditDialogOpen(false);
+  };
+
+  // Handle deleting a customer
+  const handleDeleteCustomer = () => {
+    if (!currentCustomer) return;
+    
+    // Remove customer from the list
+    const updatedCustomers = customers.filter((customer) => customer.id !== currentCustomer.id);
+    
+    setCustomers(updatedCustomers);
+    toast.success(`Customer ${currentCustomer.name} has been deleted successfully`);
+    setIsDeleteDialogOpen(false);
+  };
+
+  // Function to open edit dialog with customer data
+  const openEditDialog = (customer: any) => {
+    setCurrentCustomer(customer);
+    setIsEditDialogOpen(true);
+  };
+
+  // Function to open delete dialog with customer data
+  const openDeleteDialog = (customer: any) => {
+    setCurrentCustomer(customer);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Function to toggle customer status
+  const toggleCustomerStatus = (customerId: number) => {
+    const updatedCustomers = customers.map((customer) => {
+      if (customer.id === customerId) {
+        const newStatus = customer.status === "Active" ? "Inactive" : "Active";
+        toast.success(`Customer ${customer.name} is now ${newStatus}`);
+        return { ...customer, status: newStatus };
+      }
+      return customer;
+    });
+    
+    setCustomers(updatedCustomers);
   };
 
   return (
-    <AdminLayout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">Customers</h1>
-            <p className="text-gray-500">Manage customer accounts and view shipping history</p>
-          </div>
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Customers</h1>
+          <p className="text-gray-500">Manage customer accounts and information</p>
+        </div>
+        
+        <div className="flex gap-2">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-swift-700 hover:bg-swift-800">
-                <UserPlus className="h-4 w-4" />
-                <span>Add Customer</span>
+                <Plus className="h-4 w-4" /> Add Customer
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Add New Customer</DialogTitle>
                 <DialogDescription>
-                  Enter customer details to create a new account
+                  Create a new customer account and add their contact information.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleAddCustomer}>
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium">Customer Type</label>
-                        <div className="flex gap-4 mt-2">
-                          <label className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              name="type"
-                              value="personal"
-                              checked={newCustomer.type === "personal"}
-                              onChange={() => handleSelectChange("type", "personal")}
-                              className="text-swift-600 focus:ring-swift-500"
-                            />
-                            <span>Personal</span>
-                          </label>
-                          <label className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              name="type"
-                              value="business"
-                              checked={newCustomer.type === "business"}
-                              onChange={() => handleSelectChange("type", "business")}
-                              className="text-swift-600 focus:ring-swift-500"
-                            />
-                            <span>Business</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Name</label>
-                    <Input
-                      name="name"
-                      placeholder={newCustomer.type === "business" ? "Business Name" : "Full Name"}
-                      value={newCustomer.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Email</label>
-                      <Input
-                        name="email"
-                        type="email"
-                        placeholder="Email Address"
-                        value={newCustomer.email}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Phone</label>
-                      <Input
-                        name="phone"
-                        placeholder="Phone Number"
-                        value={newCustomer.phone}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Address</label>
-                    <Input
-                      name="address"
-                      placeholder="Street Address"
-                      value={newCustomer.address}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">City</label>
-                      <Input
-                        name="city"
-                        placeholder="City"
-                        value={newCustomer.city}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">State</label>
-                      <Input
-                        name="state"
-                        placeholder="State"
-                        value={newCustomer.state}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">ZIP Code</label>
-                      <Input
-                        name="zip"
-                        placeholder="ZIP Code"
-                        value={newCustomer.zip}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="bg-swift-700 hover:bg-swift-800">
-                    Add Customer
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <Card className="mb-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Manage Customers</CardTitle>
-              <CardDescription>View and manage customer accounts</CardDescription>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-400" />
-                  </div>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium">
+                    Full Name
+                  </label>
                   <Input
-                    type="search"
-                    placeholder="Search customers..."
-                    className="pl-10 w-64"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                    id="name"
+                    name="name"
+                    placeholder="John Doe"
+                    value={newCustomer.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium">
+                    Email Address
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="john.doe@example.com"
+                    value={newCustomer.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="phone" className="text-sm font-medium">
+                    Phone Number
+                  </label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="123-456-7890"
+                    value={newCustomer.phone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="address" className="text-sm font-medium">
+                    Address
+                  </label>
+                  <Input
+                    id="address"
+                    name="address"
+                    placeholder="123 Main St, Anytown"
+                    value={newCustomer.address}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <select 
-                  value={statusFilter} 
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="h-10 w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-                <select 
-                  value={typeFilter} 
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="h-10 w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="all">All Types</option>
-                  <option value="personal">Personal</option>
-                  <option value="business">Business</option>
-                </select>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">All Customers</TabsTrigger>
-                <TabsTrigger value="business">Business</TabsTrigger>
-                <TabsTrigger value="personal">Personal</TabsTrigger>
-                <TabsTrigger value="recent">Recent Orders</TabsTrigger>
-              </TabsList>
               
-              <TabsContent value="all" className="mt-0">
-                <div className="rounded-md border">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Order</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredCustomers.map((customer) => (
-                          <tr key={customer.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.id}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <UserCheck className="h-4 w-4 text-gray-400" />
-                                <span>{customer.name}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-1">
-                                  <Mail className="h-4 w-4 text-gray-400" />
-                                  <span>{customer.email}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Phone className="h-4 w-4 text-gray-400" />
-                                  <span>{customer.phone}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <span className={`px-2 py-1 text-xs rounded-full ${getTypeColor(customer.type)}`}>
-                                {customer.type.charAt(0).toUpperCase() + customer.type.slice(1)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(customer.status)}`}>
-                                {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <Package className="h-4 w-4 text-gray-400" />
-                                <span>{customer.totalOrders}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4 text-gray-400" />
-                                <span>{customer.lastOrder}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {customer.joined}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <Button asChild size="sm" variant="ghost">
-                                <Link to={`/admin/customers/${customer.id}`}>
-                                  <span>View</span>
-                                  <ArrowRight className="h-3 w-3 ml-1" />
-                                </Link>
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Other tabs content similar to the "all" tab but filtered */}
-              <TabsContent value="business" className="mt-0">
-                <div className="rounded-md border">
-                  <div className="p-4 text-center text-gray-500">
-                    Business customers will appear here
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="personal" className="mt-0">
-                <div className="rounded-md border">
-                  <div className="p-4 text-center text-gray-500">
-                    Personal customers will appear here
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="recent" className="mt-0">
-                <div className="rounded-md border">
-                  <div className="p-4 text-center text-gray-500">
-                    Customers with recent orders will appear here
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Customers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">{customers.length}</div>
-                <Users className="h-4 w-4 text-gray-500" />
-              </div>
-              <div className="flex items-center mt-1 text-xs">
-                <span className="text-green-500 font-medium">{customers.filter(c => c.joined.startsWith("2023")).length} new</span>
-                <span className="text-gray-500 ml-1">this year</span>
-              </div>
-            </CardContent>
-          </Card>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button className="bg-swift-700 hover:bg-swift-800" onClick={handleAddCustomer}>
+                  Add Customer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Business Customers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">{customers.filter(c => c.type === "business").length}</div>
-                <Users className="h-4 w-4 text-gray-500" />
-              </div>
-              <div className="flex items-center mt-1 text-xs">
-                <span className="text-gray-500">
-                  {Math.round((customers.filter(c => c.type === "business").length / customers.length) * 100)}% of customers
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Orders</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">
-                  {customers.reduce((total, customer) => total + customer.totalOrders, 0)}
-                </div>
-                <Package className="h-4 w-4 text-gray-500" />
-              </div>
-              <div className="flex items-center mt-1 text-xs">
-                <span className="text-gray-500">From all customers</span>
-              </div>
-            </CardContent>
-          </Card>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Download className="h-4 w-4" /> Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Export Options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Download className="h-4 w-4 mr-2" /> Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Download className="h-4 w-4 mr-2" /> Export as Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Download className="h-4 w-4 mr-2" /> Export as PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-    </AdminLayout>
+      
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle>Customer List</CardTitle>
+          <CardDescription>Manage all customer accounts and information</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              <Input
+                type="search"
+                placeholder="Search customers by name, email, or address"
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <Select
+              onValueChange={(value) => setFilterStatus(value || undefined)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  <SelectValue placeholder="Filter by status" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Address</TableHead>
+                  <TableHead>Orders</TableHead>
+                  <TableHead>Last Order</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-6 text-gray-500">
+                      No customers found. Try adjusting your search or filters.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCustomers.map((customer) => (
+                    <TableRow key={customer.id}>
+                      <TableCell className="font-medium">{customer.name}</TableCell>
+                      <TableCell>{customer.email}</TableCell>
+                      <TableCell>{customer.phone}</TableCell>
+                      <TableCell>{customer.address}</TableCell>
+                      <TableCell>{customer.orders}</TableCell>
+                      <TableCell>{customer.lastOrder}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${
+                            customer.status === "Active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {customer.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => toggleCustomerStatus(customer.id)}
+                            title={customer.status === "Active" ? "Deactivate customer" : "Activate customer"}
+                          >
+                            {customer.status === "Active" ? (
+                              <X className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <Check className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openEditDialog(customer)}
+                            title="Edit customer"
+                          >
+                            <Edit className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openDeleteDialog(customer)}
+                            title="Delete customer"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Edit Customer Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogDescription>
+              Update customer information and contact details.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {currentCustomer && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Full Name</label>
+                <Input
+                  value={currentCustomer.name}
+                  onChange={(e) =>
+                    setCurrentCustomer({ ...currentCustomer, name: e.target.value })
+                  }
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email Address</label>
+                <Input
+                  value={currentCustomer.email}
+                  onChange={(e) =>
+                    setCurrentCustomer({ ...currentCustomer, email: e.target.value })
+                  }
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Phone Number</label>
+                <Input
+                  value={currentCustomer.phone}
+                  onChange={(e) =>
+                    setCurrentCustomer({ ...currentCustomer, phone: e.target.value })
+                  }
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Address</label>
+                <Input
+                  value={currentCustomer.address}
+                  onChange={(e) =>
+                    setCurrentCustomer({ ...currentCustomer, address: e.target.value })
+                  }
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Status</label>
+                <Select
+                  value={currentCustomer.status}
+                  onValueChange={(value) =>
+                    setCurrentCustomer({ ...currentCustomer, status: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button className="bg-swift-700 hover:bg-swift-800" onClick={handleEditCustomer}>
+              Update Customer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Customer Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Customer</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this customer? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {currentCustomer && (
+            <div className="py-4">
+              <p className="text-sm text-gray-500">
+                You are about to delete the customer:
+              </p>
+              <p className="font-medium mt-1">{currentCustomer.name}</p>
+              <p className="text-sm text-gray-500 mt-1">{currentCustomer.email}</p>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteCustomer}>
+              Delete Customer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

@@ -1,152 +1,73 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import TrackingForm from "@/components/TrackingForm";
-import TrackingMap from "@/components/TrackingMap";
-import TrackingOverview from "@/components/TrackingOverview";
-import TrackingTimeline from "@/components/TrackingTimeline";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Truck } from "lucide-react";
 
 const TrackPage = () => {
-  const [isTracking, setIsTracking] = useState(false);
-  const [trackingNumber, setTrackingNumber] = useState("");
+  const navigate = useNavigate();
 
-  // Sample data - in a real app, this would come from API based on the tracking number
-  const sampleOrigin = { latitude: 32.9481, longitude: -96.7591, name: "Dallas, TX" };
-  const sampleDestination = { latitude: 39.7392, longitude: -104.9903, name: "Denver, CO" };
-  const sampleCurrentLocation = { latitude: 36.1699, longitude: -101.3864, name: "Amarillo, TX" };
-
-  // Sample tracking events for the timeline
-  const sampleTrackingEvents = [
-    {
-      id: "evt-1",
-      status: "Order Placed",
-      location: "Dallas, TX",
-      timestamp: "2023-09-15T09:30:00",
-      description: "Your package has been received by Swift Mail Service and is being prepared for shipment.",
-      isCompleted: true,
-      isCurrentEvent: false,
-    },
-    {
-      id: "evt-2",
-      status: "Processing",
-      location: "Dallas Distribution Center, TX",
-      timestamp: "2023-09-15T14:45:00",
-      description: "Your package is being processed and sorted for shipping.",
-      isCompleted: true,
-      isCurrentEvent: false,
-    },
-    {
-      id: "evt-3",
-      status: "In Transit",
-      location: "Amarillo, TX",
-      timestamp: "2023-09-16T10:15:00",
-      description: "Your package is in transit to the next facility.",
-      isCompleted: false,
-      isCurrentEvent: true,
-    },
-    {
-      id: "evt-4",
-      status: "Out for Delivery",
-      location: "Denver, CO",
-      timestamp: "2023-09-17T08:30:00",
-      description: "Your package is out for delivery and will be delivered today.",
-      isCompleted: false,
-      isCurrentEvent: false,
-    },
-    {
-      id: "evt-5",
-      status: "Delivered",
-      location: "Denver, CO",
-      timestamp: "2023-09-17T15:20:00",
-      description: "Your package has been delivered. Thank you for using Swift Mail Service!",
-      isCompleted: false,
-      isCurrentEvent: false,
-    },
-  ];
-
-  // Sample tracking details for the overview
-  const sampleTrackingDetails = {
-    trackingNumber: "SMS123456789",
-    status: "In Transit",
-    estimatedDelivery: "Sep 17, 2023",
-    shippedDate: "Sep 15, 2023",
-    service: "Express Delivery",
-    weight: "3.5 lbs",
-    from: {
-      address: "16000 Dallas Pkwy # 400",
-      city: "Dallas",
-      state: "TX",
-      zip: "75248",
-      country: "United States",
-    },
-    to: {
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "(303) 555-1234",
-      address: "1234 Main St",
-      city: "Denver",
-      state: "CO",
-      zip: "80202",
-      country: "United States",
-    },
-    progress: 45,
-    isDelivered: false,
-    priority: "express" as const,
-    itemCount: 2,
-    packageType: "Box",
-    signatureRequired: true,
-    specialInstructions: "Please leave with front desk if recipient is not available",
-  };
-
-  const handleTrackPackage = (number: string) => {
-    setTrackingNumber(number);
-    setIsTracking(true);
-    // In a real app, we would fetch the tracking data based on the tracking number
+  const handleTrackSubmit = (trackingNumber: string) => {
+    navigate(`/track/${trackingNumber}`);
   };
 
   return (
-    <div className="min-h-screen py-12 bg-gray-50">
-      <div className="container px-4 mx-auto">
-        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold mb-6 text-center">Track Your Package</h1>
-          <p className="text-gray-600 mb-8 text-center">
-            Enter your tracking number below to get real-time updates on your package's location and status.
-          </p>
-          
-          <TrackingForm onSubmit={handleTrackPackage} />
-          
-          {isTracking && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">Tracking Information for {trackingNumber || "SMS123456789"}</h2>
-              <TrackingMap 
-                origin={sampleOrigin}
-                destination={sampleDestination}
-                currentLocation={sampleCurrentLocation}
-                isDelivered={false}
-                googleMapsApiKey="AIzaSyAI42aRjF79hJMVoOC9G95rp0rxp8T3DFc"
-              />
-              
-              <div className="mt-6">
-                <TrackingOverview details={sampleTrackingDetails} />
-              </div>
-              
-              <div className="mb-6">
-                <TrackingTimeline events={sampleTrackingEvents} />
-              </div>
+    <div className="container max-w-5xl mx-auto py-16 px-4 md:px-6">
+      <div className="flex flex-col items-center text-center mb-12">
+        <div className="p-3 rounded-full bg-swift-100 mb-4">
+          <Truck className="h-8 w-8 text-swift-700" />
+        </div>
+        <h1 className="text-3xl font-bold mb-2">Track Your Package</h1>
+        <p className="text-gray-500 max-w-2xl">
+          Enter your tracking number to get real-time updates about your package's
+          location and delivery status
+        </p>
+      </div>
+      
+      <Card className="max-w-2xl mx-auto mb-12">
+        <CardHeader>
+          <CardTitle>Track a Package</CardTitle>
+          <CardDescription>
+            Enter your tracking number to get started
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TrackingForm onSubmit={handleTrackSubmit} />
+        </CardContent>
+      </Card>
+      
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border p-6">
+        <h2 className="text-xl font-semibold mb-4">How to Track Your Package</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-12 h-12 bg-swift-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-swift-700 font-bold">1</span>
             </div>
-          )}
-          
-          <div className="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-            <h2 className="text-lg font-medium mb-4">Tracking Information</h2>
-            <p className="text-gray-600">
-              With Swift Mail Service tracking, you can:
+            <h3 className="font-medium mb-2">Find Your Tracking Number</h3>
+            <p className="text-gray-500 text-sm">
+              Your tracking number is in your shipping confirmation email or receipt
             </p>
-            <ul className="list-disc list-inside space-y-2 mt-2 text-gray-600">
-              <li>View real-time package location on an interactive map</li>
-              <li>Get detailed status updates with timestamps</li>
-              <li>See estimated delivery dates and times</li>
-              <li>Receive notifications of delivery exceptions</li>
-              <li>Verify delivery with proof of delivery information</li>
-            </ul>
+          </div>
+          
+          <div className="flex flex-col items-center text-center">
+            <div className="w-12 h-12 bg-swift-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-swift-700 font-bold">2</span>
+            </div>
+            <h3 className="font-medium mb-2">Enter Tracking Number</h3>
+            <p className="text-gray-500 text-sm">
+              Insert your tracking number in the form above
+            </p>
+          </div>
+          
+          <div className="flex flex-col items-center text-center">
+            <div className="w-12 h-12 bg-swift-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-swift-700 font-bold">3</span>
+            </div>
+            <h3 className="font-medium mb-2">View Shipment Details</h3>
+            <p className="text-gray-500 text-sm">
+              Get real-time updates on your package's journey
+            </p>
           </div>
         </div>
       </div>

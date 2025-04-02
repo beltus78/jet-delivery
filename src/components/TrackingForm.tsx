@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 
 export interface TrackingFormProps {
   onSubmit: (trackingNumber: string) => void;
+  onHomepage?: boolean;
+  className?: string;
 }
 
-const TrackingForm = ({ onSubmit }: TrackingFormProps) => {
+const TrackingForm = ({ onSubmit, onHomepage, className }: TrackingFormProps) => {
   const [trackingNumber, setTrackingNumber] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
@@ -19,7 +21,7 @@ const TrackingForm = ({ onSubmit }: TrackingFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className={`w-full ${className || ""}`}>
       <div className="flex flex-col md:flex-row gap-3">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
