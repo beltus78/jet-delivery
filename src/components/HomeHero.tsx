@@ -1,64 +1,61 @@
 
-import { ArrowRight, Package, Truck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import TrackingForm from "@/components/TrackingForm";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import TrackingForm from "./TrackingForm";
 
 const HomeHero = () => {
+  const handleTrackingSubmit = (trackingNumber: string) => {
+    window.location.href = `/track/${trackingNumber}`;
+  };
+
   return (
-    <div className="relative overflow-hidden bg-swift-800 text-white">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070')] bg-cover bg-center opacity-20"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-swift-900/90 to-swift-800/70"></div>
+    <div className="relative bg-white py-12 sm:py-16 lg:py-20 overflow-hidden">
+      <div className="absolute inset-0 bg-[url('/hero-pattern.svg')] opacity-5"></div>
       
-      <div className="container relative z-10 px-4 py-20 md:py-32">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="flex flex-col justify-center space-y-6 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Swift, Reliable Package Delivery
-            </h1>
-            <p className="text-lg md:text-xl text-gray-200 max-w-xl">
-              Track your packages in real-time and enjoy fast, secure delivery to anywhere in the world.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-delivery-500 hover:bg-delivery-600 text-white gap-2">
-                <Link to="/services">
-                  <span>Our Services</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white">
-                <Link to="/contact">Contact Us</Link>
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-full bg-white/10">
-                  <Package className="h-5 w-5 text-delivery-300" />
-                </div>
-                <span>Secure Packaging</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-full bg-white/10">
-                  <Truck className="h-5 w-5 text-delivery-300" />
-                </div>
-                <span>Fast Delivery</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-full bg-white/10">
-                  <Clock className="h-5 w-5 text-delivery-300" />
-                </div>
-                <span>24/7 Tracking</span>
-              </div>
-            </div>
-          </div>
+      <Container className="relative z-10">
+        <div className="text-center max-w-4xl mx-auto mb-10 sm:mb-12">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight mb-6">
+            Fast, Reliable <span className="text-swift-600">Delivery</span> Services Nationwide
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 mx-auto max-w-3xl">
+            Ship with confidence using our secure, efficient, and affordable shipping services. 
+            Track your package or get a quick quote today.
+          </p>
           
-          <div className="flex items-center justify-center">
-            <TrackingForm onHomepage className="w-full max-w-md" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <Button asChild size="lg" className="bg-swift-600 hover:bg-swift-700">
+              <Link to="/services" className="flex items-center">
+                Our Services
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/contact">Get a Quote</Link>
+            </Button>
           </div>
         </div>
-      </div>
+        
+        <div className="bg-white shadow-xl rounded-xl p-6 md:p-8 max-w-3xl mx-auto border border-gray-100">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Track Your Package</h2>
+            <p className="text-gray-600">Enter your tracking number to get real-time updates on your shipment</p>
+          </div>
+          
+          <TrackingForm 
+            onSubmit={handleTrackingSubmit} 
+            onHomepage={true} 
+            className="max-w-2xl mx-auto" 
+          />
+          
+          <div className="mt-6 text-center text-sm text-gray-500">
+            <p>Don't have a tracking number? <Link to="/contact" className="text-swift-600 hover:underline">Contact us</Link> for assistance.</p>
+          </div>
+        </div>
+      </Container>
+      
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-100 to-transparent"></div>
     </div>
   );
 };

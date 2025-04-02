@@ -1,11 +1,11 @@
 
 import { useEffect, useState } from "react";
-import { PackageLocation } from "@/types/tracking";
+import { TrackingPoint } from "@/types/tracking";
 
 interface TrackingMapProps {
-  origin: PackageLocation;
-  destination: PackageLocation;
-  currentLocation: PackageLocation;
+  origin: TrackingPoint;
+  destination: TrackingPoint;
+  currentLocation: TrackingPoint;
   isDelivered: boolean;
 }
 

@@ -15,6 +15,7 @@ import LoginPage from "./pages/LoginPage";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import PackagesPage from "./pages/admin/PackagesPage";
+import PackageDetails from "./pages/admin/PackageDetails";
 import DeliveriesPage from "./pages/admin/DeliveriesPage";
 import CustomersPage from "./pages/admin/CustomersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="packages" element={<PackagesPage />} />
+            <Route path="packages/:id" element={<PackageDetails />} />
             <Route path="deliveries" element={<DeliveriesPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="reports" element={<ReportsPage />} />
