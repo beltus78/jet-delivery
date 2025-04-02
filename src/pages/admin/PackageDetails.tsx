@@ -433,7 +433,8 @@ const PackageDetails = () => {
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Current Status</span>
-                      <Badge variant={status === "Delivered" ? "success" : "default"}>
+                      <Badge variant={status === "Delivered" ? "secondary" : "default"} 
+                        className={status === "Delivered" ? "bg-green-500 hover:bg-green-600" : ""}>
                         {status}
                       </Badge>
                     </div>
