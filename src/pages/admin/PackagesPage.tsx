@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Package, 
@@ -420,7 +421,7 @@ const PackagesPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   {statusOptions.map((status) => (
                     <SelectItem key={status} value={status}>
                       {status}

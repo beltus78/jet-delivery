@@ -274,7 +274,7 @@ const DeliveriesPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Statuses</SelectItem>
+                  <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="Processing">Processing</SelectItem>
                   <SelectItem value="In Transit">In Transit</SelectItem>
                   <SelectItem value="Out for Delivery">Out for Delivery</SelectItem>
@@ -292,7 +292,7 @@ const DeliveriesPage = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Priorities</SelectItem>
+                  <SelectItem value="all">All Priorities</SelectItem>
                   <SelectItem value="Express">Express</SelectItem>
                   <SelectItem value="Expedited">Expedited</SelectItem>
                   <SelectItem value="Standard">Standard</SelectItem>
