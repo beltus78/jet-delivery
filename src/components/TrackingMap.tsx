@@ -9,16 +9,15 @@ interface Location {
   name: string;
 }
 
-interface TrackingMapProps {
+export interface TrackingMapProps {
   origin: Location;
   destination: Location;
   currentLocation: Location;
   isDelivered: boolean;
+  googleMapsApiKey?: string;
 }
 
-const MAP_API_KEY = "YOUR_MAPBOX_API_KEY"; // You would need to replace this with a real API key
-
-const TrackingMap = ({ origin, destination, currentLocation, isDelivered }: TrackingMapProps) => {
+const TrackingMap = ({ origin, destination, currentLocation, isDelivered, googleMapsApiKey }: TrackingMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
@@ -153,7 +152,9 @@ const TrackingMap = ({ origin, destination, currentLocation, isDelivered }: Trac
           <div ref={mapRef} className="w-full h-full">
             {/* This would be replaced with an actual map in a real implementation */}
             <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
-              <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s+0039a6(${origin.longitude},${origin.latitude}),pin-s+ea4335(${destination.longitude},${destination.latitude}),pin-s+14b8a6(${currentLocation.longitude},${currentLocation.latitude})/auto/500x400?access_token=${MAP_API_KEY}')] bg-cover opacity-60"></div>
+              <div className="absolute inset-0 bg-cover opacity-60" style={{
+                backgroundImage: `url('https://maps.googleapis.com/maps/api/staticmap?center=${currentLocation.latitude},${currentLocation.longitude}&zoom=5&size=600x400&maptype=roadmap&markers=color:blue%7Clabel:O%7C${origin.latitude},${origin.longitude}&markers=color:red%7Clabel:D%7C${destination.latitude},${destination.longitude}&markers=color:green%7Clabel:C%7C${currentLocation.latitude},${currentLocation.longitude}&key=${googleMapsApiKey || ""}')`
+              }}></div>
               
               <div className="absolute top-4 right-4 bg-white/90 p-3 rounded-lg shadow text-sm space-y-2 z-20">
                 <div className="flex items-center gap-2">
@@ -229,9 +230,6 @@ const TrackingMap = ({ origin, destination, currentLocation, isDelivered }: Trac
                 <p className="text-gray-600">{currentLocation.name}</p>
               </div>
             </div>
-          </div>
-          <div className="absolute bottom-0 right-0 p-2 text-xs text-gray-500">
-            Map visualization placeholder - implement with Mapbox/Google Maps
           </div>
         </>
       )}

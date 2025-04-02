@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { 
   Package, 
   Truck, 
@@ -14,17 +14,16 @@ import {
   X,
   User,
   Home,
-  HelpCircle
+  HelpCircle,
+  UserPlus,
+  FileText,
+  LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-}
-
-export const AdminLayout = ({ children }: AdminLayoutProps) => {
+export const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(3);
@@ -101,7 +100,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 }`}
               >
                 <Link to="/admin/dashboard" className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                  <LayoutDashboard className="h-5 w-5" />
                   <span>Dashboard</span>
                 </Link>
               </Button>
@@ -157,8 +156,22 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 }`}
               >
                 <Link to="/admin/reports" className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                  <FileText className="h-5 w-5" />
                   <span>Reports</span>
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant={location.pathname === "/admin/users" ? "default" : "ghost"}
+                className={`w-full justify-start ${
+                  location.pathname === "/admin/users"
+                    ? "bg-swift-700 hover:bg-swift-800"
+                    : ""
+                }`}
+              >
+                <Link to="/admin/users" className="flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" />
+                  <span>User Management</span>
                 </Link>
               </Button>
               <Button
@@ -180,7 +193,6 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           
           <div className="p-4 border-t">
             <Button
-              asChild
               variant="ghost"
               className="w-full justify-start text-gray-600"
               onClick={handleLogout}
@@ -230,6 +242,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
               {location.pathname === "/admin/customers" && "Customers"}
               {location.pathname === "/admin/reports" && "Reports"}
               {location.pathname === "/admin/settings" && "Settings"}
+              {location.pathname === "/admin/users" && "User Management"}
             </h1>
           </div>
           
@@ -283,7 +296,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 }`}
               >
                 <Link to="/admin/dashboard" className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                  <LayoutDashboard className="h-5 w-5" />
                   <span>Dashboard</span>
                 </Link>
               </Button>
@@ -339,8 +352,22 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 }`}
               >
                 <Link to="/admin/reports" className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                  <FileText className="h-5 w-5" />
                   <span>Reports</span>
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant={location.pathname === "/admin/users" ? "default" : "ghost"}
+                className={`w-full justify-start ${
+                  location.pathname === "/admin/users"
+                    ? "bg-swift-700 hover:bg-swift-800"
+                    : ""
+                }`}
+              >
+                <Link to="/admin/users" className="flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" />
+                  <span>User Management</span>
                 </Link>
               </Button>
               <Button
@@ -373,8 +400,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           </div>
         )}
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-          {children}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+          <Outlet />
         </main>
       </div>
     </div>

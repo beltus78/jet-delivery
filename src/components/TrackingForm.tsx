@@ -1,69 +1,44 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, Package } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 
-interface TrackingFormProps {
-  onHomepage?: boolean;
-  className?: string;
+export interface TrackingFormProps {
+  onSubmit: (trackingNumber: string) => void;
 }
 
-const TrackingForm = ({ onHomepage = false, className = "" }: TrackingFormProps) => {
+const TrackingForm = ({ onSubmit }: TrackingFormProps) => {
   const [trackingNumber, setTrackingNumber] = useState("");
-  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
-    if (!trackingNumber.trim()) {
-      toast.error("Please enter a tracking number");
-      return;
+    if (trackingNumber.trim()) {
+      onSubmit(trackingNumber);
     }
-    
-    // In a real app, this would validate the tracking number format
-    if (trackingNumber.length < 8) {
-      toast.error("Please enter a valid tracking number");
-      return;
-    }
-    
-    // Redirect to the tracking details page
-    navigate(`/track/${trackingNumber}`);
   };
 
   return (
-    <div className={`${className} ${onHomepage ? "bg-white shadow-lg rounded-xl p-6" : ""}`}>
-      {onHomepage && (
-        <div className="mb-4 flex items-center gap-2">
-          <Package className="h-5 w-5 text-swift-700" />
-          <h2 className="text-xl font-bold">Track Your Package</h2>
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-        <div className="flex-1">
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
           <Input
             type="text"
-            placeholder="Enter tracking number"
             value={trackingNumber}
             onChange={(e) => setTrackingNumber(e.target.value)}
-            className="h-11"
+            placeholder="Enter your tracking number"
+            className="pl-10 w-full"
+            required
           />
         </div>
-        <Button type="submit" className="h-11 gap-2">
-          <Search className="h-4 w-4" />
-          <span>Track</span>
+        <Button type="submit" className="bg-swift-700 hover:bg-swift-800">
+          Track Package
         </Button>
-      </form>
-      
-      {onHomepage && (
-        <p className="text-sm text-gray-500 mt-2">
-          Enter your tracking number to get real-time updates on your package location.
-        </p>
-      )}
-    </div>
+      </div>
+    </form>
   );
 };
 

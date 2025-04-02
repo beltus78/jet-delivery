@@ -12,12 +12,14 @@ import TrackingDetailsPage from "./pages/TrackingDetailsPage";
 import ServicesPage from "./pages/ServicesPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
+import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import PackagesPage from "./pages/admin/PackagesPage";
 import DeliveriesPage from "./pages/admin/DeliveriesPage";
 import CustomersPage from "./pages/admin/CustomersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import UserManagementPage from "./pages/admin/UserManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -36,12 +38,18 @@ const App = () => (
             <Route path="/contact" element={<ContactPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/packages" element={<PackagesPage />} />
-          <Route path="/admin/deliveries" element={<DeliveriesPage />} />
-          <Route path="/admin/customers" element={<CustomersPage />} />
-          <Route path="/admin/reports" element={<ReportsPage />} />
-          <Route path="/admin/settings" element={<SettingsPage />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="packages" element={<PackagesPage />} />
+            <Route path="deliveries" element={<DeliveriesPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="users" element={<UserManagementPage />} />
+          </Route>
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

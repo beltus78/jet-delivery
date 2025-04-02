@@ -1,46 +1,39 @@
 
 import { useState } from "react";
-import { 
-  Settings, 
-  User, 
-  UserPlus, 
-  Users, 
-  Lock, 
-  Bell, 
-  Mail,
-  Building, 
-  MapPin,
-  Phone,
-  Globe,
-  Check,
-  Trash2,
-  ArrowRight,
-  ShieldCheck,
+import {
+  Settings,
+  Save,
+  UserCircle,
+  BellRing,
+  Lock,
   Shield,
-  ShieldX
+  Globe,
+  CreditCard,
+  Mail,
+  Bell,
+  Key,
+  Truck as TruckIcon,
+  Map,
+  Clipboard,
+  Zap,
+  Upload
 } from "lucide-react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -48,913 +41,602 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-// Sample user data
-const sampleUsers = [
-  {
-    id: "USR001",
-    name: "Admin User",
-    email: "admin@swiftmail.com",
-    role: "admin",
-    status: "active",
-    lastLogin: "2023-09-16 08:45 AM"
-  },
-  {
-    id: "USR002",
-    name: "Sarah Williams",
-    email: "sarah.williams@swiftmail.com",
-    role: "manager",
-    status: "active",
-    lastLogin: "2023-09-15 04:22 PM"
-  },
-  {
-    id: "USR003",
-    name: "Robert Chen",
-    email: "robert.chen@swiftmail.com",
-    role: "dispatcher",
-    status: "active",
-    lastLogin: "2023-09-16 09:30 AM"
-  },
-  {
-    id: "USR004",
-    name: "James Peterson",
-    email: "james.peterson@swiftmail.com",
-    role: "customer_service",
-    status: "inactive",
-    lastLogin: "2023-09-10 11:15 AM"
-  },
-  {
-    id: "USR005",
-    name: "Maria Rodriguez",
-    email: "maria.rodriguez@swiftmail.com",
-    role: "manager",
-    status: "active",
-    lastLogin: "2023-09-16 07:55 AM"
-  }
-];
-
 const SettingsPage = () => {
-  const [users, setUsers] = useState(sampleUsers);
-  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [companyName, setCompanyName] = useState("Swift Mail Service");
+  const [emailAddress, setEmailAddress] = useState("admin@swiftmail.com");
+  const [supportEmail, setSupportEmail] = useState("support@swiftmail.com");
+  const [phoneNumber, setPhoneNumber] = useState("(555) 123-4567");
+  const [address, setAddress] = useState("16000 Dallas Pkwy # 400, Dallas, TX 75248");
   
-  // Company profile state
-  const [companyProfile, setCompanyProfile] = useState({
-    name: "Swift Mail Service",
-    email: "info@swiftmail.com",
-    phone: "(214) 555-7890",
-    address: "16000 Dallas Pkwy # 400",
-    city: "Dallas",
-    state: "TX",
-    zip: "75248",
-    country: "United States",
-    website: "www.swiftmail.com"
-  });
+  const [notifyNewPackages, setNotifyNewPackages] = useState(true);
+  const [notifyDeliveryUpdates, setNotifyDeliveryUpdates] = useState(true);
+  const [notifySystemAlerts, setNotifySystemAlerts] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
   
-  // New user form state
-  const [newUser, setNewUser] = useState({
-    name: "",
-    email: "",
-    role: "customer_service",
-    password: "",
-    confirmPassword: ""
-  });
+  const [trackingPrefix, setTrackingPrefix] = useState("SMS");
+  const [defaultWeightUnit, setDefaultWeightUnit] = useState("lbs");
+  const [defaultDistanceUnit, setDefaultDistanceUnit] = useState("miles");
+  const [defaultCurrency, setDefaultCurrency] = useState("USD");
   
-  const [notificationSettings, setNotificationSettings] = useState({
-    emailAlerts: true,
-    smsAlerts: false,
-    systemNotifications: true,
-    deliveryUpdates: true,
-    marketingEmails: false,
-    weeklyReports: true,
-    securityAlerts: true
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewUser({
-      ...newUser,
-      [name]: value,
-    });
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState("AIzaSyAI42aRjF79hJMVoOC9G95rp0rxp8T3DFc");
+  const [smtpServer, setSmtpServer] = useState("smtp.swiftmail.com");
+  const [smtpPort, setSmtpPort] = useState("587");
+  const [smtpUsername, setSmtpUsername] = useState("notifications@swiftmail.com");
+  
+  const handleSaveGeneralSettings = () => {
+    toast.success("General settings have been saved successfully");
   };
-
-  const handleProfileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCompanyProfile({
-      ...companyProfile,
-      [name]: value,
-    });
+  
+  const handleSaveNotificationSettings = () => {
+    toast.success("Notification settings have been saved successfully");
   };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setNewUser({
-      ...newUser,
-      [name]: value,
-    });
+  
+  const handleSaveSystemSettings = () => {
+    toast.success("System settings have been saved successfully");
   };
-
-  const handleNotificationChange = (setting: string, checked: boolean) => {
-    setNotificationSettings({
-      ...notificationSettings,
-      [setting]: checked
-    });
-  };
-
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Company profile updated successfully");
-  };
-
-  const handleSaveNotifications = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Notification settings updated successfully");
-  };
-
-  const handleAddUser = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate passwords match
-    if (newUser.password !== newUser.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    
-    // Create a new user
-    const createdUser = {
-      id: `USR${Math.floor(Math.random() * 900) + 100}`,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      status: "active",
-      lastLogin: "Never"
-    };
-    
-    // Add to users list
-    setUsers([...users, createdUser]);
-    
-    // Close dialog and show success message
-    setShowAddUserDialog(false);
-    toast.success("User added successfully");
-    
-    // Reset form
-    setNewUser({
-      name: "",
-      email: "",
-      role: "customer_service",
-      password: "",
-      confirmPassword: ""
-    });
-  };
-
-  const getRoleBadge = (role: string) => {
-    switch(role) {
-      case "admin":
-        return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
-            <ShieldCheck className="h-3 w-3" />
-            <span>Admin</span>
-          </div>
-        );
-      case "manager":
-        return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
-            <Shield className="h-3 w-3" />
-            <span>Manager</span>
-          </div>
-        );
-      case "dispatcher":
-        return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-            <Truck className="h-3 w-3" />
-            <span>Dispatcher</span>
-          </div>
-        );
-      case "customer_service":
-        return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs">
-            <Users className="h-3 w-3" />
-            <span>Customer Service</span>
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
-            <User className="h-3 w-3" />
-            <span>User</span>
-          </div>
-        );
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    return status === "active" ? (
-      <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-        <Check className="h-3 w-3" />
-        <span>Active</span>
-      </div>
-    ) : (
-      <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
-        <ShieldX className="h-3 w-3" />
-        <span>Inactive</span>
-      </div>
-    );
+  
+  const handleSaveIntegrationSettings = () => {
+    toast.success("Integration settings have been saved successfully");
   };
 
   return (
-    <AdminLayout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-            <p className="text-gray-500">Manage system settings and user accounts</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">Settings</h1>
+          <p className="text-gray-500">Manage system settings and preferences</p>
         </div>
-
-        <Tabs defaultValue="company" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="company" className="flex items-center gap-2">
-              <Building className="h-4 w-4" />
-              <span>Company Profile</span>
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>User Management</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span>Notifications</span>
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Lock className="h-4 w-4" />
-              <span>Security</span>
-            </TabsTrigger>
-          </TabsList>
+      </div>
+      
+      <Tabs defaultValue="general" className="space-y-4">
+        <TabsList className="grid grid-cols-1 md:grid-cols-4 gap-2">
+          <TabsTrigger value="general" className="flex items-center gap-2">
+            <UserCircle className="h-4 w-4" /> General
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <BellRing className="h-4 w-4" /> Notifications
+          </TabsTrigger>
+          <TabsTrigger value="system" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" /> System
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="flex items-center gap-2">
+            <Zap className="h-4 w-4" /> Integrations
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="general" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Company Information</CardTitle>
+              <CardDescription>
+                Update your company details and contact information
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Company Name</Label>
+                <Input
+                  id="companyName"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="emailAddress">Email Address</Label>
+                <Input
+                  id="emailAddress"
+                  type="email"
+                  value={emailAddress}
+                  onChange={(e) => setEmailAddress(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="supportEmail">Support Email</Label>
+                <Input
+                  id="supportEmail"
+                  type="email"
+                  value={supportEmail}
+                  onChange={(e) => setSupportEmail(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="address">Business Address</Label>
+                <Textarea
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  rows={3}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="logo">Company Logo</Label>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <TruckIcon className="h-8 w-8 text-swift-700" />
+                  </div>
+                  <Button variant="outline" className="gap-2">
+                    <Upload className="h-4 w-4" /> Upload New Logo
+                  </Button>
+                </div>
+              </div>
+              
+              <Button
+                className="bg-swift-700 hover:bg-swift-800 mt-2 gap-2"
+                onClick={handleSaveGeneralSettings}
+              >
+                <Save className="h-4 w-4" /> Save Changes
+              </Button>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="company">
-            <Card>
-              <CardHeader>
-                <CardTitle>Company Profile</CardTitle>
-                <CardDescription>Manage your company information</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSaveProfile}>
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="company-name">Company Name</Label>
-                        <Input
-                          id="company-name"
-                          name="name"
-                          value={companyProfile.name}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-website">Website</Label>
-                        <Input
-                          id="company-website"
-                          name="website"
-                          value={companyProfile.website}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Security Settings</CardTitle>
+              <CardDescription>
+                Update password and security preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input id="currentPassword" type="password" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input id="newPassword" type="password" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input id="confirmPassword" type="password" />
+              </div>
+              
+              <div className="flex items-center gap-2 mt-4">
+                <Switch id="twoFactor" />
+                <Label htmlFor="twoFactor">Enable Two-Factor Authentication</Label>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Switch id="sessionTimeout" defaultChecked />
+                <Label htmlFor="sessionTimeout">
+                  Automatically log out after inactivity (30 minutes)
+                </Label>
+              </div>
+              
+              <Button
+                className="bg-swift-700 hover:bg-swift-800 mt-2 gap-2"
+              >
+                <Lock className="h-4 w-4" /> Update Security Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="notifications" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Notification Preferences</CardTitle>
+              <CardDescription>
+                Control what notifications you receive and how
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5 text-swift-700" />
+                    <Label htmlFor="notifyNewPackages">New Package Registrations</Label>
+                  </div>
+                  <Switch
+                    id="notifyNewPackages"
+                    checked={notifyNewPackages}
+                    onCheckedChange={setNotifyNewPackages}
+                  />
+                </div>
+                
+                <div className="flex items-center gap-4 justify-between">
+                  <div className="flex items-center gap-2">
+                    <TruckIcon className="h-5 w-5 text-swift-700" />
+                    <Label htmlFor="notifyDeliveryUpdates">Delivery Status Updates</Label>
+                  </div>
+                  <Switch
+                    id="notifyDeliveryUpdates"
+                    checked={notifyDeliveryUpdates}
+                    onCheckedChange={setNotifyDeliveryUpdates}
+                  />
+                </div>
+                
+                <div className="flex items-center gap-4 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-swift-700" />
+                    <Label htmlFor="notifySystemAlerts">System Alerts</Label>
+                  </div>
+                  <Switch
+                    id="notifySystemAlerts"
+                    checked={notifySystemAlerts}
+                    onCheckedChange={setNotifySystemAlerts}
+                  />
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t mt-4">
+                <h3 className="text-sm font-medium mb-3">Notification Channels</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-4 justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-5 w-5 text-swift-700" />
+                      <Label htmlFor="inAppNotifications">In-App Notifications</Label>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="company-email">Email</Label>
-                        <Input
-                          id="company-email"
-                          name="email"
-                          type="email"
-                          value={companyProfile.email}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-phone">Phone</Label>
-                        <Input
-                          id="company-phone"
-                          name="phone"
-                          value={companyProfile.phone}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
+                    <Switch id="inAppNotifications" defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center gap-4 justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-5 w-5 text-swift-700" />
+                      <Label htmlFor="emailNotifications">Email Notifications</Label>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="company-address">Address</Label>
+                    <Switch
+                      id="emailNotifications"
+                      checked={emailNotifications}
+                      onCheckedChange={setEmailNotifications}
+                    />
+                  </div>
+                  
+                  {emailNotifications && (
+                    <div className="ml-7 mt-2">
+                      <Label htmlFor="notificationEmail" className="text-sm">
+                        Notification Email Address
+                      </Label>
                       <Input
-                        id="company-address"
-                        name="address"
-                        value={companyProfile.address}
-                        onChange={handleProfileInputChange}
+                        id="notificationEmail"
+                        className="mt-1"
+                        value="admin@swiftmail.com"
                       />
                     </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="company-city">City</Label>
-                        <Input
-                          id="company-city"
-                          name="city"
-                          value={companyProfile.city}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-state">State</Label>
-                        <Input
-                          id="company-state"
-                          name="state"
-                          value={companyProfile.state}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-zip">ZIP Code</Label>
-                        <Input
-                          id="company-zip"
-                          name="zip"
-                          value={companyProfile.zip}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-country">Country</Label>
-                        <Input
-                          id="company-country"
-                          name="country"
-                          value={companyProfile.country}
-                          onChange={handleProfileInputChange}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <Button type="submit" className="bg-swift-700 hover:bg-swift-800">
-                        Save Changes
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="users">
-            <Card className="mb-6">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>User Management</CardTitle>
-                  <CardDescription>Add and manage user accounts</CardDescription>
+                  )}
                 </div>
-                <Dialog open={showAddUserDialog} onOpenChange={setShowAddUserDialog}>
-                  <DialogTrigger asChild>
-                    <Button className="gap-2 bg-swift-700 hover:bg-swift-800">
-                      <UserPlus className="h-4 w-4" />
-                      <span>Add User</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader>
-                      <DialogTitle>Add New User</DialogTitle>
-                      <DialogDescription>
-                        Create a new user account with appropriate roles and permissions
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleAddUser}>
-                      <div className="grid gap-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="user-name">Full Name</Label>
-                          <Input
-                            id="user-name"
-                            name="name"
-                            placeholder="Enter user's full name"
-                            value={newUser.name}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="user-email">Email</Label>
-                          <Input
-                            id="user-email"
-                            name="email"
-                            type="email"
-                            placeholder="Enter user's email address"
-                            value={newUser.email}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="user-role">Role</Label>
-                          <Select 
-                            value={newUser.role}
-                            onValueChange={(value) => handleSelectChange("role", value)}
-                          >
-                            <SelectTrigger id="user-role">
-                              <SelectValue placeholder="Select user role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="dispatcher">Dispatcher</SelectItem>
-                              <SelectItem value="customer_service">Customer Service</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="user-password">Password</Label>
-                          <Input
-                            id="user-password"
-                            name="password"
-                            type="password"
-                            placeholder="Enter password"
-                            value={newUser.password}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="user-confirm-password">Confirm Password</Label>
-                          <Input
-                            id="user-confirm-password"
-                            name="confirmPassword"
-                            type="password"
-                            placeholder="Confirm password"
-                            value={newUser.confirmPassword}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setShowAddUserDialog(false)}>
-                          Cancel
-                        </Button>
-                        <Button type="submit" className="bg-swift-700 hover:bg-swift-800">
-                          Add User
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {users.map((user) => (
-                          <tr key={user.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.id}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <User className="h-4 w-4 text-gray-500" />
-                                </div>
-                                <span>{user.name}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {getRoleBadge(user.role)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {getStatusBadge(user.status)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.lastLogin}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center gap-2">
-                                <Button size="sm" variant="ghost" className="h-8 px-2">
-                                  <ArrowRight className="h-4 w-4" />
-                                </Button>
-                                <Button size="sm" variant="ghost" className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Role Permissions</CardTitle>
-                  <CardDescription>Manage what each role can access</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                        <ShieldCheck className="h-4 w-4 text-red-500" />
-                        <span>Admin Role</span>
-                      </h3>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Full access to all system features and settings
-                      </div>
-                      <div className="space-y-2 border rounded-md p-3">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="admin-packages">Packages Management</Label>
-                          <Switch id="admin-packages" checked={true} disabled />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="admin-deliveries">Deliveries Management</Label>
-                          <Switch id="admin-deliveries" checked={true} disabled />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="admin-customers">Customers Management</Label>
-                          <Switch id="admin-customers" checked={true} disabled />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="admin-reports">Reports Access</Label>
-                          <Switch id="admin-reports" checked={true} disabled />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="admin-settings">Settings Access</Label>
-                          <Switch id="admin-settings" checked={true} disabled />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="admin-users">User Management</Label>
-                          <Switch id="admin-users" checked={true} disabled />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-blue-500" />
-                        <span>Manager Role</span>
-                      </h3>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Access to operations and staff management
-                      </div>
-                      <div className="space-y-2 border rounded-md p-3">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="manager-packages">Packages Management</Label>
-                          <Switch id="manager-packages" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="manager-deliveries">Deliveries Management</Label>
-                          <Switch id="manager-deliveries" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="manager-customers">Customers Management</Label>
-                          <Switch id="manager-customers" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="manager-reports">Reports Access</Label>
-                          <Switch id="manager-reports" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="manager-settings">Settings Access</Label>
-                          <Switch id="manager-settings" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="manager-users">User Management</Label>
-                          <Switch id="manager-users" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle>Additional Roles</CardTitle>
-                  <CardDescription>Customized permissions for specific roles</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                        <Truck className="h-4 w-4 text-green-500" />
-                        <span>Dispatcher Role</span>
-                      </h3>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Focuses on delivery and route management
-                      </div>
-                      <div className="space-y-2 border rounded-md p-3">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="dispatcher-packages">Packages Management</Label>
-                          <Switch id="dispatcher-packages" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="dispatcher-deliveries">Deliveries Management</Label>
-                          <Switch id="dispatcher-deliveries" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="dispatcher-customers">Customers Management</Label>
-                          <Switch id="dispatcher-customers" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="dispatcher-reports">Reports Access</Label>
-                          <Switch id="dispatcher-reports" />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                        <Users className="h-4 w-4 text-amber-500" />
-                        <span>Customer Service Role</span>
-                      </h3>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Focuses on customer support and package tracking
-                      </div>
-                      <div className="space-y-2 border rounded-md p-3">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="cs-packages">View Packages</Label>
-                          <Switch id="cs-packages" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="cs-edit-packages">Edit Packages</Label>
-                          <Switch id="cs-edit-packages" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="cs-customers">Customers Management</Label>
-                          <Switch id="cs-customers" defaultChecked />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="cs-delivery-view">View Deliveries</Label>
-                          <Switch id="cs-delivery-view" defaultChecked />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <Button className="bg-swift-700 hover:bg-swift-800">
-                        Save Permissions
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+              <Button
+                className="bg-swift-700 hover:bg-swift-800 mt-4 gap-2"
+                onClick={handleSaveNotificationSettings}
+              >
+                <Save className="h-4 w-4" /> Save Notification Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="system" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>System Configuration</CardTitle>
+              <CardDescription>
+                Configure system-wide settings and defaults
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="trackingPrefix">Tracking Number Prefix</Label>
+                <Input
+                  id="trackingPrefix"
+                  value={trackingPrefix}
+                  onChange={(e) => setTrackingPrefix(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Example: {trackingPrefix}123456789
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="defaultWeightUnit">Default Weight Unit</Label>
+                  <Select
+                    value={defaultWeightUnit}
+                    onValueChange={setDefaultWeightUnit}
+                  >
+                    <SelectTrigger id="defaultWeightUnit">
+                      <SelectValue placeholder="Select weight unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="lbs">Pounds (lbs)</SelectItem>
+                      <SelectItem value="kg">Kilograms (kg)</SelectItem>
+                      <SelectItem value="oz">Ounces (oz)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="defaultDistanceUnit">Default Distance Unit</Label>
+                  <Select
+                    value={defaultDistanceUnit}
+                    onValueChange={setDefaultDistanceUnit}
+                  >
+                    <SelectTrigger id="defaultDistanceUnit">
+                      <SelectValue placeholder="Select distance unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="miles">Miles</SelectItem>
+                      <SelectItem value="km">Kilometers</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="space-y-2 pt-4">
+                <Label htmlFor="defaultCurrency">Default Currency</Label>
+                <Select
+                  value={defaultCurrency}
+                  onValueChange={setDefaultCurrency}
+                >
+                  <SelectTrigger id="defaultCurrency">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">US Dollar (USD)</SelectItem>
+                    <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                    <SelectItem value="GBP">British Pound (GBP)</SelectItem>
+                    <SelectItem value="CAD">Canadian Dollar (CAD)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex items-center gap-2 mt-4">
+                <Switch id="darkMode" />
+                <Label htmlFor="darkMode">Enable Dark Mode</Label>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Switch id="compactView" />
+                <Label htmlFor="compactView">Use Compact View</Label>
+              </div>
+              
+              <Button
+                className="bg-swift-700 hover:bg-swift-800 mt-4 gap-2"
+                onClick={handleSaveSystemSettings}
+              >
+                <Save className="h-4 w-4" /> Save System Settings
+              </Button>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Settings</CardTitle>
-                <CardDescription>Configure when and how you receive notifications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSaveNotifications}>
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-medium mb-3">Email Notifications</h3>
-                      <div className="space-y-3 border rounded-md p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="email-alerts" className="font-medium">Email Alerts</Label>
-                            <p className="text-sm text-gray-500">Receive important system alerts via email</p>
-                          </div>
-                          <Switch 
-                            id="email-alerts" 
-                            checked={notificationSettings.emailAlerts}
-                            onCheckedChange={(checked) => handleNotificationChange("emailAlerts", checked)}
-                          />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="security-alerts" className="font-medium">Security Alerts</Label>
-                            <p className="text-sm text-gray-500">Receive security-related alerts via email</p>
-                          </div>
-                          <Switch 
-                            id="security-alerts" 
-                            checked={notificationSettings.securityAlerts}
-                            onCheckedChange={(checked) => handleNotificationChange("securityAlerts", checked)}
-                          />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="weekly-reports" className="font-medium">Weekly Reports</Label>
-                            <p className="text-sm text-gray-500">Receive weekly performance and activity reports</p>
-                          </div>
-                          <Switch 
-                            id="weekly-reports" 
-                            checked={notificationSettings.weeklyReports}
-                            onCheckedChange={(checked) => handleNotificationChange("weeklyReports", checked)}
-                          />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="marketing-emails" className="font-medium">Marketing Emails</Label>
-                            <p className="text-sm text-gray-500">Receive promotional and marketing communications</p>
-                          </div>
-                          <Switch 
-                            id="marketing-emails" 
-                            checked={notificationSettings.marketingEmails}
-                            onCheckedChange={(checked) => handleNotificationChange("marketingEmails", checked)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium mb-3">System Notifications</h3>
-                      <div className="space-y-3 border rounded-md p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="system-notifications" className="font-medium">System Notifications</Label>
-                            <p className="text-sm text-gray-500">Receive in-app notifications about system events</p>
-                          </div>
-                          <Switch 
-                            id="system-notifications" 
-                            checked={notificationSettings.systemNotifications}
-                            onCheckedChange={(checked) => handleNotificationChange("systemNotifications", checked)}
-                          />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="delivery-updates" className="font-medium">Delivery Updates</Label>
-                            <p className="text-sm text-gray-500">Receive notifications about delivery status changes</p>
-                          </div>
-                          <Switch 
-                            id="delivery-updates" 
-                            checked={notificationSettings.deliveryUpdates}
-                            onCheckedChange={(checked) => handleNotificationChange("deliveryUpdates", checked)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium mb-3">SMS Notifications</h3>
-                      <div className="space-y-3 border rounded-md p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="sms-alerts" className="font-medium">SMS Alerts</Label>
-                            <p className="text-sm text-gray-500">Receive important alerts via SMS</p>
-                          </div>
-                          <Switch 
-                            id="sms-alerts" 
-                            checked={notificationSettings.smsAlerts}
-                            onCheckedChange={(checked) => handleNotificationChange("smsAlerts", checked)}
-                          />
-                        </div>
-                        
-                        {notificationSettings.smsAlerts && (
-                          <div className="space-y-2 mt-2 pl-2 border-l-2 border-gray-200">
-                            <div className="space-y-1">
-                              <Label htmlFor="phone-number" className="text-sm">Phone Number</Label>
-                              <Input id="phone-number" placeholder="Enter phone number" defaultValue="(214) 555-7890" />
-                            </div>
-                            <div className="flex items-center space-x-2 text-sm">
-                              <input type="checkbox" id="verify-phone" className="rounded border-gray-300" />
-                              <Label htmlFor="verify-phone">Verify phone number for SMS notifications</Label>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <Button type="submit" className="bg-swift-700 hover:bg-swift-800">
-                        Save Notification Settings
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>Manage security preferences and password settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-sm font-medium mb-3">Password Settings</h3>
-                    <div className="space-y-3 border rounded-md p-4">
-                      <form className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="current-password">Current Password</Label>
-                          <Input id="current-password" type="password" placeholder="Enter current password" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="new-password">New Password</Label>
-                          <Input id="new-password" type="password" placeholder="Enter new password" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="confirm-password">Confirm New Password</Label>
-                          <Input id="confirm-password" type="password" placeholder="Confirm new password" />
-                        </div>
-                        <div className="flex justify-end">
-                          <Button type="button" onClick={() => toast.success("Password changed successfully")} className="bg-swift-700 hover:bg-swift-800">
-                            Change Password
-                          </Button>
-                        </div>
-                      </form>
-                    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Data Management</CardTitle>
+              <CardDescription>
+                Manage system data and exports
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Switch id="autoBackup" defaultChecked />
+                <Label htmlFor="autoBackup">Enable Automatic Daily Backups</Label>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Switch id="dataRetention" defaultChecked />
+                <Label htmlFor="dataRetention">
+                  Retain delivery data for 12 months
+                </Label>
+              </div>
+              
+              <div className="pt-4 flex flex-wrap gap-2">
+                <Button variant="outline" className="gap-2">
+                  <Clipboard className="h-4 w-4" /> Export All Data
+                </Button>
+                <Button variant="outline" className="gap-2">
+                  <Clipboard className="h-4 w-4" /> Export Customers
+                </Button>
+                <Button variant="outline" className="gap-2">
+                  <Clipboard className="h-4 w-4" /> Export Deliveries
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="integrations" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>API Settings</CardTitle>
+              <CardDescription>
+                Manage API keys and third-party integrations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="apiKey">API Key</Label>
+                <div className="flex">
+                  <Input
+                    id="apiKey"
+                    value="sk_test_51JyUwrR0nZILZj8WZYZZZeGhH7XOW"
+                    readOnly
+                    className="rounded-r-none"
+                  />
+                  <Button className="rounded-l-none bg-swift-700 hover:bg-swift-800">
+                    <Key className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Your API key. Keep this secure and do not share it publicly.
+                </p>
+              </div>
+              
+              <div className="space-y-2 pt-4">
+                <Label htmlFor="googleMapsApiKey">Google Maps API Key</Label>
+                <Input
+                  id="googleMapsApiKey"
+                  value={googleMapsApiKey}
+                  onChange={(e) => setGoogleMapsApiKey(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Used for maps and location tracking features.
+                </p>
+              </div>
+              
+              <div className="pt-4 border-t mt-4">
+                <h3 className="text-sm font-medium mb-3">Email Integration</h3>
+                
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpServer">SMTP Server</Label>
+                    <Input
+                      id="smtpServer"
+                      value={smtpServer}
+                      onChange={(e) => setSmtpServer(e.target.value)}
+                    />
                   </div>
                   
-                  <div>
-                    <h3 className="text-sm font-medium mb-3">Login Security</h3>
-                    <div className="space-y-3 border rounded-md p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="two-factor" className="font-medium">Two-Factor Authentication</Label>
-                          <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
-                        </div>
-                        <Switch id="two-factor" defaultChecked={false} />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="session-timeout" className="font-medium">Session Timeout</Label>
-                          <p className="text-sm text-gray-500">Automatically log out after a period of inactivity</p>
-                        </div>
-                        <Select defaultValue="60">
-                          <SelectTrigger id="session-timeout" className="w-[180px]">
-                            <SelectValue placeholder="Select timeout" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="15">15 minutes</SelectItem>
-                            <SelectItem value="30">30 minutes</SelectItem>
-                            <SelectItem value="60">1 hour</SelectItem>
-                            <SelectItem value="120">2 hours</SelectItem>
-                            <SelectItem value="240">4 hours</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="secure-login-history" className="font-medium">Login History</Label>
-                          <p className="text-sm text-gray-500">View your recent account login activity</p>
-                        </div>
-                        <Button variant="outline" onClick={() => toast.info("Login history would be displayed here")}>
-                          View History
-                        </Button>
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpPort">SMTP Port</Label>
+                    <Input
+                      id="smtpPort"
+                      value={smtpPort}
+                      onChange={(e) => setSmtpPort(e.target.value)}
+                    />
                   </div>
                   
-                  <div>
-                    <h3 className="text-sm font-medium mb-3">API Access</h3>
-                    <div className="space-y-3 border rounded-md p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="api-access" className="font-medium">API Access</Label>
-                          <p className="text-sm text-gray-500">Enable API access for external integrations</p>
-                        </div>
-                        <Switch id="api-access" defaultChecked={true} />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label htmlFor="api-keys" className="font-medium">API Keys</Label>
-                          <p className="text-sm text-gray-500">Manage API keys for accessing your account data</p>
-                        </div>
-                        <Button variant="outline" onClick={() => toast.info("API key management would be shown here")}>
-                          Manage Keys
-                        </Button>
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpUsername">SMTP Username</Label>
+                    <Input
+                      id="smtpUsername"
+                      value={smtpUsername}
+                      onChange={(e) => setSmtpUsername(e.target.value)}
+                    />
                   </div>
                   
-                  <div className="flex justify-end">
-                    <Button onClick={() => toast.success("Security settings saved")} className="bg-swift-700 hover:bg-swift-800">
-                      Save Security Settings
-                    </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="smtpPassword">SMTP Password</Label>
+                    <Input id="smtpPassword" type="password" value="••••••••••••" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </AdminLayout>
+              </div>
+              
+              <div className="pt-4 border-t mt-4">
+                <h3 className="text-sm font-medium mb-3">Payment Integration</h3>
+                
+                <div className="flex items-center gap-2 mb-4">
+                  <Switch id="enablePayments" />
+                  <Label htmlFor="enablePayments">Enable Payment Processing</Label>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="paymentProcessor">Payment Processor</Label>
+                  <Select defaultValue="stripe">
+                    <SelectTrigger id="paymentProcessor">
+                      <SelectValue placeholder="Select payment processor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="stripe">Stripe</SelectItem>
+                      <SelectItem value="paypal">PayPal</SelectItem>
+                      <SelectItem value="square">Square</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2 mt-3">
+                  <Label htmlFor="stripeApiKey">Stripe API Key</Label>
+                  <Input
+                    id="stripeApiKey"
+                    value="pk_test_51JyUwrR0nZILZj8WZYZZZeGhH7XOW"
+                  />
+                </div>
+              </div>
+              
+              <Button
+                className="bg-swift-700 hover:bg-swift-800 mt-4 gap-2"
+                onClick={handleSaveIntegrationSettings}
+              >
+                <Save className="h-4 w-4" /> Save Integration Settings
+              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Connected Services</CardTitle>
+              <CardDescription>
+                Manage third-party service connections
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded">
+                      <Map className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Google Maps</p>
+                      <p className="text-sm text-gray-500">Connected</p>
+                    </div>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 rounded">
+                      <CreditCard className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Stripe Payments</p>
+                      <p className="text-sm text-gray-500">Connected</p>
+                    </div>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded">
+                      <Mail className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Mailchimp</p>
+                      <p className="text-sm text-gray-500">Not connected</p>
+                    </div>
+                  </div>
+                  <Switch />
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded">
+                      <Globe className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Social Media Integration</p>
+                      <p className="text-sm text-gray-500">Not connected</p>
+                    </div>
+                  </div>
+                  <Switch />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
