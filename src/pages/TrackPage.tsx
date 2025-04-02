@@ -1,15 +1,15 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TrackingForm from "@/components/TrackingForm";
 import TrackingMap from "@/components/TrackingMap";
 import TrackingOverview from "@/components/TrackingOverview";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import TrackingTimeline from "@/components/TrackingTimeline";
 
 const TrackPage = () => {
-  const [showSample, setShowSample] = useState(false);
+  const [isTracking, setIsTracking] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState("");
 
+  // Sample data - in a real app, this would come from API based on the tracking number
   const sampleOrigin = { latitude: 32.9481, longitude: -96.7591, name: "Dallas, TX" };
   const sampleDestination = { latitude: 39.7392, longitude: -104.9903, name: "Denver, CO" };
   const sampleCurrentLocation = { latitude: 36.1699, longitude: -101.3864, name: "Amarillo, TX" };
@@ -63,7 +63,7 @@ const TrackPage = () => {
     },
   ];
 
-  // Sample tracking details for the overview - fixing the TS error by using the correct priority type
+  // Sample tracking details for the overview
   const sampleTrackingDetails = {
     trackingNumber: "SMS123456789",
     status: "In Transit",
@@ -90,18 +90,17 @@ const TrackPage = () => {
     },
     progress: 45,
     isDelivered: false,
-    priority: "express" as const, // Fixed the type error by using 'as const'
+    priority: "express" as const,
     itemCount: 2,
     packageType: "Box",
     signatureRequired: true,
     specialInstructions: "Please leave with front desk if recipient is not available",
   };
 
-  const handleShowSample = () => {
-    setShowSample(true);
-    toast.info("Showing sample tracking map", {
-      description: "This is how your package tracking will look"
-    });
+  const handleTrackPackage = (number: string) => {
+    setTrackingNumber(number);
+    setIsTracking(true);
+    // In a real app, we would fetch the tracking data based on the tracking number
   };
 
   return (
@@ -113,26 +112,17 @@ const TrackPage = () => {
             Enter your tracking number below to get real-time updates on your package's location and status.
           </p>
           
-          <TrackingForm />
+          <TrackingForm onSubmit={handleTrackPackage} />
           
-          <div className="flex justify-center mt-4">
-            <Button 
-              variant="outline" 
-              onClick={handleShowSample} 
-              className="text-swift-600 hover:text-swift-700"
-            >
-              See Sample Tracking
-            </Button>
-          </div>
-          
-          {showSample && (
+          {isTracking && (
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">Sample Tracking Information</h2>
+              <h2 className="text-xl font-semibold mb-4">Tracking Information for {trackingNumber || "SMS123456789"}</h2>
               <TrackingMap 
                 origin={sampleOrigin}
                 destination={sampleDestination}
                 currentLocation={sampleCurrentLocation}
                 isDelivered={false}
+                googleMapsApiKey="AIzaSyAI42aRjF79hJMVoOC9G95rp0rxp8T3DFc"
               />
               
               <div className="mt-6">

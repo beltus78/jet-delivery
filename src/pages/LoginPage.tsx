@@ -23,12 +23,12 @@ const LoginPage = () => {
     
     // Simulate authentication
     setTimeout(() => {
-      // In a real app, you would validate credentials
+      // In a real app, you would validate credentials against a backend API
       if (email === "admin@swiftmail.com" && password === "admin123") {
         toast.success("Login successful!");
         navigate("/admin/dashboard");
       } else {
-        toast.error("Invalid credentials. Try admin@swiftmail.com / admin123");
+        toast.error("Invalid credentials");
       }
       setLoading(false);
     }, 1500);
@@ -117,12 +117,6 @@ const LoginPage = () => {
               </Button>
             </div>
           </form>
-          
-          <div className="mt-6 text-center text-gray-600 text-sm">
-            <p>Demo Credentials:</p>
-            <p>Email: admin@swiftmail.com</p>
-            <p>Password: admin123</p>
-          </div>
         </div>
       </div>
     </div>
