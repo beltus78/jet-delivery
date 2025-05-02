@@ -6,23 +6,27 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 
-// Fix for Leaflet marker icons in production builds
-// This resolves the missing marker icon issue
-useEffect(() => {
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  });
-}, []);
-
 interface TrackingMapProps {
   origin: TrackingPoint;
   destination: TrackingPoint;
   currentLocation: TrackingPoint;
   isDelivered: boolean;
 }
+
+// Fix for Leaflet marker icons in production builds
+// This resolves the missing marker icon issue
+const LeafletFixIcons = () => {
+  useEffect(() => {
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+  }, []);
+  
+  return null;
+};
 
 // Custom markers for different locations
 const createCustomIcon = (color: string) => {
@@ -143,21 +147,20 @@ const TrackingMap = ({
   
   return (
     <div className="relative rounded-lg overflow-hidden border border-gray-200 h-[400px] bg-gray-50">
+      <LeafletFixIcons />
       <MapContainer 
-        center={[currentLocation.lat, currentLocation.lng]} 
-        zoom={5} 
         style={{ height: "100%", width: "100%" }}
         className="z-0 transition-opacity duration-500"
+        zoom={5}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         
         {/* Origin Marker */}
         <Marker 
           position={[origin.lat, origin.lng]} 
-          icon={createCustomIcon('green')}
         >
           <Popup>
             <strong>Origin:</strong> {origin.label}
@@ -167,7 +170,6 @@ const TrackingMap = ({
         {/* Current Location Marker with pulsating effect */}
         <Marker 
           position={[currentLocation.lat, currentLocation.lng]} 
-          icon={createCustomIcon('blue')}
         >
           <Popup>
             <strong>Current Location:</strong> {currentLocation.label}
@@ -178,7 +180,6 @@ const TrackingMap = ({
         {/* Destination Marker */}
         <Marker 
           position={[destination.lat, destination.lng]} 
-          icon={createCustomIcon('red')}
         >
           <Popup>
             <strong>Destination:</strong> {destination.label}
@@ -189,18 +190,14 @@ const TrackingMap = ({
         {/* Completed route path */}
         <Polyline 
           positions={completedRoutePath as [number, number][]} 
-          color="#0000ff" 
-          weight={4}
-          dashArray={isDelivered ? "" : ""}
+          pathOptions={{ color: "#0000ff", weight: 4, dashArray: isDelivered ? undefined : undefined }}
         />
         
         {/* Remaining route path (if not delivered) */}
         {!isDelivered && (
           <Polyline 
             positions={remainingRoutePath as [number, number][]} 
-            color="#0000ff80" 
-            weight={4}
-            dashArray="10,10"
+            pathOptions={{ color: "#0000ff80", weight: 4, dashArray: "10,10" }}
           />
         )}
         
