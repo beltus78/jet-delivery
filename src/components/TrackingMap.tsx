@@ -23,6 +23,13 @@ const TrackingMap = ({
       // Using Google Maps with provided API key
       const apiKey = "AIzaSyD7RZd5JPiPBmV8A14TP2oQ3YQSXtzTqgA";
       
+      // Validate coordinates before creating the map
+      if (!origin?.lat || !origin?.lng || !destination?.lat || !destination?.lng || !currentLocation?.lat || !currentLocation?.lng) {
+        console.error("Invalid tracking coordinates:", { origin, destination, currentLocation });
+        setError("Invalid location data. Please check tracking information.");
+        return;
+      }
+      
       // Create marker string for origin, destination and current location
       const originMarker = `&markers=color:green|label:A|${origin.lat},${origin.lng}`;
       const destinationMarker = `&markers=color:red|label:B|${destination.lat},${destination.lng}`;
@@ -40,7 +47,7 @@ const TrackingMap = ({
         pathString += `&path=color:0x0000ff80|weight:5|${currentLocation.lat},${currentLocation.lng}|${destination.lat},${destination.lng}`;
       }
       
-      // Generate Google Maps static map URL - make sure all parameters are properly formatted
+      // Generate Google Maps static map URL
       const url = `https://maps.googleapis.com/maps/api/staticmap?size=800x400&zoom=5${originMarker}${destinationMarker}${currentLocationMarker}${pathString}&key=${apiKey}`;
       
       console.log("Generated map URL:", url);
@@ -55,7 +62,7 @@ const TrackingMap = ({
   return (
     <div className="relative rounded-lg overflow-hidden border border-gray-200 h-[400px] bg-gray-50">
       {error ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <p className="text-red-500">{error}</p>
           <p className="text-gray-500 mt-2 text-sm">Please ensure Google Maps Static API is enabled in your Google Cloud Console</p>
         </div>

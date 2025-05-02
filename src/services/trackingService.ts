@@ -1,12 +1,27 @@
-
 import { TrackingEvent } from "@/components/TrackingTimeline";
 import { TrackingDetailsType } from "@/components/TrackingOverview";
+import { TrackingPoint } from "@/types/tracking";
 
 // Mock locations for packages
 const locations = {
-  origin: { latitude: 32.9481, longitude: -96.7591, name: "Dallas, TX" },
-  destination: { latitude: 39.7392, longitude: -104.9903, name: "Denver, CO" },
-  current: { latitude: 36.1699, longitude: -101.3864, name: "Amarillo, TX" },
+  origin: { 
+    id: "origin",
+    lat: 32.9481, 
+    lng: -96.7591, 
+    label: "Dallas, TX" 
+  },
+  destination: { 
+    id: "destination",
+    lat: 39.7392, 
+    lng: -104.9903, 
+    label: "Denver, CO" 
+  },
+  current: { 
+    id: "current",
+    lat: 36.1699, 
+    lng: -101.3864, 
+    label: "Amarillo, TX" 
+  },
 };
 
 // Mock events for a package in transit
@@ -263,7 +278,12 @@ export const getTrackingEvents = (trackingNumber: string): Promise<TrackingEvent
 };
 
 // Function to get tracking map data
-export const getTrackingMapData = (trackingNumber: string) => {
+export const getTrackingMapData = (trackingNumber: string): Promise<{
+  origin: TrackingPoint;
+  destination: TrackingPoint;
+  currentLocation: TrackingPoint;
+  isDelivered: boolean;
+}> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const details = mockTrackingDetails[trackingNumber];
