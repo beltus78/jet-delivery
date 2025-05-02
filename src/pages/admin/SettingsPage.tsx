@@ -37,7 +37,7 @@ const SettingsPage = () => {
   const [supportEmail, setSupportEmail] = useState("support@swiftmail.com");
   const [phoneNumber, setPhoneNumber] = useState("+1 (555) 123-4567");
   const [address, setAddress] = useState("123 Main St, Anytown, USA");
-  const [mapApiKey, setMapApiKey] = useState("AIzaSyAI42aRjF79hJMVoOC9G95rp0rxp8T3DFc");
+  const [mapApiKey, setMapApiKey] = useState("AIzaSyD7RZd5JPiPBmV8A14TP2oQ3YQSXtzTqgA");
   const [deliveryCost, setDeliveryCost] = useState("10.00");
   const [taxRate, setTaxRate] = useState("0.05");
   const [timezone, setTimezone] = useState("America/Los_Angeles");

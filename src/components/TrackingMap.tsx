@@ -21,7 +21,7 @@ const TrackingMap = ({
   useEffect(() => {
     try {
       // Using Google Maps with provided API key
-      const apiKey = "AIzaSyAI42aRjF79hJMVoOC9G95rp0rxp8T3DFc";
+      const apiKey = "AIzaSyD7RZd5JPiPBmV8A14TP2oQ3YQSXtzTqgA";
       
       // Create marker string for origin, destination and current location
       const originMarker = `&markers=color:green|label:A|${origin.lat},${origin.lng}`;
