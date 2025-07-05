@@ -43,7 +43,7 @@ const Index = () => {
                   </div>
                   <div>
                     <h3 className="font-medium">Phone</h3>
-                    <p className="text-gray-600">(346) 298-4617</p>
+                    <p className="text-gray-600">+1 (346) 298-4617</p>
                   </div>
                 </div>
                 
@@ -53,7 +53,7 @@ const Index = () => {
                   </div>
                   <div>
                     <h3 className="font-medium">Email</h3>
-                    <p className="text-gray-600">contact@jetdelivery.com</p>
+                    <p className="text-gray-600">Jetdeliveryagency@gmail.com</p>
                   </div>
                 </div>
               </div>
