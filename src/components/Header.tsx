@@ -11,7 +11,7 @@ const Header = () => {
           <div className="relative h-8 w-8 overflow-hidden">
             <Truck className="h-8 w-8 text-swift-700" />
           </div>
-          <span className="hidden font-bold text-xl sm:inline-block">Swift Mail Service</span>
+          <span className="hidden font-bold text-xl sm:inline-block">Jet Delivery</span>
         </Link>
         
         <nav className="ml-auto flex gap-2">

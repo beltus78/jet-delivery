@@ -10,7 +10,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Truck className="h-6 w-6" />
-              <h3 className="text-xl font-bold">Swift Mail Service</h3>
+              <h3 className="text-xl font-bold">Jet Delivery</h3>
             </div>
             <p className="text-gray-300 mb-4">
               Fast, reliable shipping solutions for businesses and individuals.
@@ -25,7 +25,7 @@ const Footer = () => {
             </div>
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-delivery-400" />
-              <span className="text-sm text-gray-300">contact@swiftmailservice.com</span>
+              <span className="text-sm text-gray-300">contact@jetdelivery.com</span>
             </div>
           </div>
           
@@ -101,7 +101,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; {new Date().getFullYear()} Swift Mail Service. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Jet Delivery. All rights reserved.</p>
         </div>
       </div>
     </footer>

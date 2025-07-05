@@ -5,19 +5,19 @@ import { User } from "lucide-react";
 const testimonials = [
   {
     id: 1,
-    quote: "Swift Mail Service has completely transformed our shipping process. Their tracking system is outstanding and our customers love the transparency.",
+    quote: "Jet Delivery has completely transformed our shipping process. Their tracking system is outstanding and our customers love the transparency.",
     author: "Michael Johnson",
     position: "CEO, Tech Solutions Inc.",
   },
   {
     id: 2,
-    quote: "As an ecommerce business, reliable shipping is crucial. Swift Mail Service delivers consistently and their tracking map is a game-changer.",
+    quote: "As an ecommerce business, reliable shipping is crucial. Jet Delivery delivers consistently and their tracking map is a game-changer.",
     author: "Sarah Thompson",
     position: "Founder, StyleShop",
   },
   {
     id: 3,
-    quote: "The attention to detail and care given to our packages is unmatched. I can always count on Swift Mail for timely deliveries.",
+    quote: "The attention to detail and care given to our packages is unmatched. I can always count on Jet Delivery for timely deliveries.",
     author: "David Chen",
     position: "Operations Manager, Global Exports",
   },
