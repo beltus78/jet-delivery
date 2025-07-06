@@ -78,7 +78,7 @@ export const AdminLayout = () => {
           <div className="p-4 border-b flex items-center justify-between">
             <Link to="/admin/dashboard" className="flex items-center gap-2">
               <Truck className="h-6 w-6 text-swift-700" />
-              <span className="font-bold text-lg">Swift Admin</span>
+              <span className="font-bold text-lg">Jet Delivery Admin</span>
             </Link>
             <button
               className="md:hidden text-gray-500 hover:text-gray-700"
@@ -276,7 +276,7 @@ export const AdminLayout = () => {
               </div>
               <div className="hidden md:block">
                 <p className="text-sm font-medium">Admin User</p>
-                <p className="text-xs text-gray-500">admin@swiftmail.com</p>
+                <p className="text-xs text-gray-500">admin@jetdelivery.com</p>
               </div>
             </div>
           </div>

@@ -109,7 +109,7 @@ const ContactPage = () => {
                 <h2 className="text-xl font-semibold mb-4">Our Location</h2>
                 <div className="h-[200px] rounded-lg overflow-hidden">
                   <iframe
-                    title="Swift Mail Service Location"
+                    title="Jet Delivery Location"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3347.6598121566147!2d-96.82442408481056!3d32.97741808091052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864c23d5eeed355f%3A0x648a6a8201a1b6be!2s16000%20Dallas%20Pkwy%20%23%20400%2C%20Dallas%2C%20TX%2075248%2C%20USA!5e0!3m2!1sen!2sng!4v1645435695914!5m2!1sen!2sng"
                     width="100%"
                     height="100%"

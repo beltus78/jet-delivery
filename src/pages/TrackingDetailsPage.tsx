@@ -66,7 +66,7 @@ const TrackingDetailsPage = () => {
     if (navigator.share) {
       navigator.share({
         title: "Package Tracking",
-        text: `Track my package with Swift Mail Service: ${trackingNumber}`,
+        text: `Track my package with Jet Delivery: ${trackingNumber}`,
         url: window.location.href,
       }).catch(err => {
         console.error("Error sharing:", err);

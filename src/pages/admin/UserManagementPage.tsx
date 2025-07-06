@@ -62,7 +62,7 @@ const initialUsers = [
   {
     id: 1,
     name: "Admin User",
-    email: "admin@swiftmail.com",
+            email: "admin@jetdelivery.com",
     role: "Admin",
     status: "Active",
     lastLogin: "2023-09-15 09:30:00",
@@ -71,7 +71,7 @@ const initialUsers = [
   {
     id: 2,
     name: "Sarah Manager",
-    email: "sarah@swiftmail.com",
+            email: "sarah@jetdelivery.com",
     role: "Manager",
     status: "Active",
     lastLogin: "2023-09-15 11:20:00",
@@ -80,7 +80,7 @@ const initialUsers = [
   {
     id: 3,
     name: "John Operator",
-    email: "john@swiftmail.com",
+            email: "john@jetdelivery.com",
     role: "Operator",
     status: "Active",
     lastLogin: "2023-09-14 16:45:00",
@@ -89,7 +89,7 @@ const initialUsers = [
   {
     id: 4,
     name: "Emily Agent",
-    email: "emily@swiftmail.com",
+            email: "emily@jetdelivery.com",
     role: "Agent",
     status: "Inactive",
     lastLogin: "2023-09-10 08:15:00",
@@ -98,7 +98,7 @@ const initialUsers = [
   {
     id: 5,
     name: "Michael Viewer",
-    email: "michael@swiftmail.com",
+            email: "michael@jetdelivery.com",
     role: "Viewer",
     status: "Active",
     lastLogin: "2023-09-13 14:30:00",

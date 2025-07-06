@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -10,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { AuthService } from "@/services/authService";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -17,21 +17,56 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    // Simulate authentication
-    setTimeout(() => {
-      // In a real app, you would validate credentials against a backend API
-      if (email && password) {
-        toast.success("Login successful!");
-        navigate("/admin/dashboard");
-      } else {
+    try {
+      // Validate inputs
+      if (!email || !password) {
         toast.error("Please enter your email and password");
+        return;
       }
+
+      // Attempt to sign in
+      const { user, session } = await AuthService.signIn(email, password);
+      
+      if (user && session) {
+        toast.success("Login successful!");
+        
+        // Get user profile to determine role
+        const userProfile = await AuthService.getCurrentUser();
+        
+        // Redirect based on role
+        if (userProfile?.role === 'admin' || userProfile?.role === 'manager') {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/admin/dashboard"); // Default to admin dashboard for now
+        }
+      } else {
+        toast.error("Invalid credentials");
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast.error(error.message || "Login failed. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("Please enter your email address first");
+      return;
+    }
+
+    try {
+      await AuthService.resetPassword(email);
+      toast.success("Password reset email sent! Check your inbox.");
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      toast.error(error.message || "Failed to send reset email");
+    }
   };
 
   return (
@@ -47,7 +82,7 @@ const LoginPage = () => {
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold">Welcome Back</h1>
             <p className="text-gray-600 mt-1">
-              Log in to your Swift Mail Service account
+              Log in to your Jet Delivery account
             </p>
           </div>
           
@@ -68,6 +103,7 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -77,9 +113,14 @@ const LoginPage = () => {
                 <label htmlFor="password" className="text-sm font-medium">
                   Password
                 </label>
-                <a href="#" className="text-sm text-swift-600 hover:text-swift-800">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-sm text-swift-600 hover:text-swift-800"
+                  disabled={loading}
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
               <div className="relative">
                 <div className="absolute left-3 top-3 text-gray-400">
@@ -93,6 +134,7 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -117,6 +159,12 @@ const LoginPage = () => {
               </Button>
             </div>
           </form>
+
+          <div className="mt-6 text-center text-sm text-gray-500">
+            <p>
+              Demo credentials: admin@jetdelivery.com / password123
+            </p>
+          </div>
         </div>
       </div>
     </div>

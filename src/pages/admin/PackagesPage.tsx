@@ -1,248 +1,421 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Plus, Filter, ArrowUpDown, Package as PackageIcon, Truck, MapPin, Clock } from "lucide-react";
+import { 
+  Package, 
+  Plus, 
+  Search, 
+  Filter, 
+  Eye, 
+  Edit, 
+  Trash2, 
+  MoreHorizontal,
+  Calendar,
+  MapPin,
+  User,
+  Truck,
+  CheckCircle,
+  Clock,
+  AlertCircle
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { PackageService } from "@/services/packageService";
+import { CustomerService } from "@/services/customerService";
+import { useAuth } from "@/hooks/useAuth";
 
-// Sample package data
-const packages = [
-  {
-    id: "PKG001",
-    trackingNumber: "SMS123456789",
-    customer: "John Smith",
-    from: "Dallas, TX",
-    to: "Denver, CO",
-    status: "In Transit",
-    date: "2023-09-16",
-    location: "Amarillo, TX"
-  },
-  {
-    id: "PKG002",
-    trackingNumber: "SMS987654321",
-    customer: "Emily Johnson",
-    from: "Dallas, TX",
-    to: "Chicago, IL",
-    status: "Delivered",
-    date: "2023-09-15",
-    location: "Chicago, IL"
-  },
-  {
-    id: "PKG003",
-    trackingNumber: "SMS456789123",
-    customer: "Robert Williams",
-    from: "Dallas, TX",
-    to: "Miami, FL",
-    status: "Processing",
-    date: "2023-09-16",
-    location: "Dallas, TX"
-  },
-  {
-    id: "PKG004",
-    trackingNumber: "SMS789123456",
-    customer: "Sarah Davis",
-    from: "Dallas, TX",
-    to: "Los Angeles, CA",
-    status: "Out for Delivery",
-    date: "2023-09-16",
-    location: "Los Angeles, CA"
-  },
-  {
-    id: "PKG005",
-    trackingNumber: "SMS321654987",
-    customer: "Michael Brown",
-    from: "Dallas, TX",
-    to: "Seattle, WA",
-    status: "Processing",
-    date: "2023-09-16",
-    location: "Dallas, TX"
-  },
-];
+interface PackageWithCustomer {
+  id: string;
+  tracking_number: string;
+  status: string;
+  description?: string;
+  weight?: number;
+  origin_address: string;
+  origin_city: string;
+  origin_state?: string;
+  destination_address: string;
+  destination_city: string;
+  destination_state?: string;
+  estimated_delivery_date?: string;
+  created_at: string;
+  customer?: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone?: string;
+  };
+}
 
-const PackagesPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+export default function PackagesPage() {
+  const { user } = useAuth();
+  const [packages, setPackages] = useState<PackageWithCustomer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  
-  const filteredPackages = packages.filter(pkg => {
-    const matchesSearch = 
-      pkg.trackingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pkg.customer.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || pkg.status.toLowerCase() === statusFilter.toLowerCase();
-    
-    return matchesSearch && matchesStatus;
-  });
-  
-  const getStatusColor = (status: string) => {
-    switch(status.toLowerCase()) {
-      case "delivered":
-        return "bg-green-100 text-green-700";
-      case "in transit":
-        return "bg-blue-100 text-blue-700";
-      case "processing":
-        return "bg-amber-100 text-amber-700";
-      case "out for delivery":
-        return "bg-purple-100 text-purple-700";
-      default:
-        return "bg-gray-100 text-gray-700";
+  const [selectedPackage, setSelectedPackage] = useState<PackageWithCustomer | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  useEffect(() => {
+    loadPackages();
+  }, []);
+
+  const loadPackages = async () => {
+    try {
+      setLoading(true);
+      const data = await PackageService.getAllPackages();
+      setPackages(data);
+    } catch (error) {
+      console.error('Error loading packages:', error);
+      toast.error('Failed to load packages');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleDeletePackage = async (packageId: string) => {
+    try {
+      await PackageService.deletePackage(packageId);
+      toast.success('Package deleted successfully');
+      loadPackages();
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error('Error deleting package:', error);
+      toast.error('Failed to delete package');
+    }
+  };
+
+  const handleStatusUpdate = async (packageId: string, newStatus: string) => {
+    try {
+      await PackageService.updatePackageStatus(packageId, newStatus);
+      toast.success('Package status updated successfully');
+      loadPackages();
+    } catch (error) {
+      console.error('Error updating package status:', error);
+      toast.error('Failed to update package status');
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'delivered':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'in_transit':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'out_for_delivery':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'picked_up':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case 'delivered':
+        return <CheckCircle className="h-4 w-4" />;
+      case 'in_transit':
+        return <Truck className="h-4 w-4" />;
+      case 'out_for_delivery':
+        return <MapPin className="h-4 w-4" />;
+      case 'picked_up':
+        return <Package className="h-4 w-4" />;
+      case 'pending':
+        return <Clock className="h-4 w-4" />;
+      default:
+        return <AlertCircle className="h-4 w-4" />;
+    }
+  };
+
+  const filteredPackages = packages.filter(pkg => {
+    const matchesSearch = pkg.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         pkg.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         `${pkg.customer?.first_name} ${pkg.customer?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || pkg.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-swift-700"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Packages</h1>
-          <p className="text-gray-500">Manage and track all package shipments</p>
+          <h1 className="text-2xl font-bold text-gray-900">Shipments</h1>
+          <p className="text-gray-600">
+            Manage all your packages and track their status
+          </p>
         </div>
-        
-        <Button className="gap-2 bg-swift-700 hover:bg-swift-800">
-          <Plus className="h-4 w-4" />
-          <span>New Package</span>
+        <Button asChild>
+          <Link to="/admin/packages/new">
+            <Plus className="h-4 w-4 mr-2" />
+            New Shipment
+          </Link>
         </Button>
       </div>
-      
+
+      {/* Filters */}
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle>All Packages</CardTitle>
-            <CardDescription>View all packages in the system</CardDescription>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
+        <CardContent className="p-6">
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                type="search"
-                placeholder="Search packages..."
-                className="pl-10 w-full sm:w-64"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by tracking number, description, or customer..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
               />
             </div>
-            
-            <div className="flex items-center gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-gray-500" />
-                    <SelectValue placeholder="Filter by status" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="in transit">In Transit</SelectItem>
-                  <SelectItem value="out for delivery">Out for Delivery</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="picked_up">Picked Up</SelectItem>
+                <SelectItem value="in_transit">In Transit</SelectItem>
+                <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
+                <SelectItem value="delivered">Delivered</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Packages Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPackages.map((pkg) => (
+          <Card key={pkg.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  {getStatusIcon(pkg.status)}
+                  <Badge variant="outline" className={getStatusColor(pkg.status)}>
+                    {pkg.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </Badge>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Package Actions</DialogTitle>
+                      <DialogDescription>
+                        Choose an action for package {pkg.tracking_number}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                      <Button variant="outline" asChild className="w-full justify-start">
+                        <Link to={`/admin/packages/${pkg.id}`}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </Link>
+                      </Button>
+                      <Button variant="outline" asChild className="w-full justify-start">
+                        <Link to={`/admin/packages/${pkg.id}/edit`}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Package
+                        </Link>
+                      </Button>
+                      <Select onValueChange={(value) => handleStatusUpdate(pkg.id, value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Update Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="picked_up">Picked Up</SelectItem>
+                          <SelectItem value="in_transit">In Transit</SelectItem>
+                          <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
+                          <SelectItem value="delivered">Delivered</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" className="w-full justify-start">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Package
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete package {pkg.tracking_number}? 
+                              This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeletePackage(pkg.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <CardTitle className="text-lg">{pkg.tracking_number}</CardTitle>
+              <CardDescription>
+                {pkg.description || 'No description provided'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Customer Info */}
+              <div className="flex items-center space-x-2 text-sm">
+                <User className="h-4 w-4 text-gray-400" />
+                <span>
+                  {pkg.customer ? `${pkg.customer.first_name} ${pkg.customer.last_name}` : 'Unknown Customer'}
+                </span>
+              </div>
+
+              {/* Route Info */}
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-sm">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <span className="font-medium">Route:</span>
+                </div>
+                <div className="text-sm text-gray-600 pl-6">
+                  <div>{pkg.origin_city}, {pkg.origin_state}</div>
+                  <div className="text-gray-400">↓</div>
+                  <div>{pkg.destination_city}, {pkg.destination_state}</div>
+                </div>
+              </div>
+
+              {/* Package Details */}
+              <div className="flex justify-between text-sm">
+                <div>
+                  <span className="text-gray-500">Weight:</span>
+                  <span className="ml-1 font-medium">
+                    {pkg.weight ? `${pkg.weight} lbs` : 'N/A'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Created:</span>
+                  <span className="ml-1 font-medium">
+                    {new Date(pkg.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Estimated Delivery */}
+              {pkg.estimated_delivery_date && (
+                <div className="flex items-center space-x-2 text-sm">
+                  <Calendar className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-500">ETA:</span>
+                  <span className="font-medium">
+                    {new Date(pkg.estimated_delivery_date).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-2 pt-2">
+                <Button variant="outline" size="sm" asChild className="flex-1">
+                  <Link to={`/admin/packages/${pkg.id}`}>
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild className="flex-1">
+                  <Link to={`/admin/packages/${pkg.id}/edit`}>
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {filteredPackages.length === 0 && !loading && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No packages found</h3>
+            <p className="text-gray-600 mb-4">
+              {searchTerm || statusFilter !== 'all' 
+                ? 'Try adjusting your search or filter criteria.'
+                : 'Get started by creating your first shipment.'
+              }
+            </p>
+            {!searchTerm && statusFilter === 'all' && (
+              <Button asChild>
+                <Link to="/admin/packages/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create First Shipment
+                </Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Summary Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-blue-600">
+                {packages.filter(p => p.status === 'pending').length}
+              </div>
+              <div className="text-sm text-gray-600">Pending</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-orange-600">
+                {packages.filter(p => p.status === 'picked_up').length}
+              </div>
+              <div className="text-sm text-gray-600">Picked Up</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">
+                {packages.filter(p => p.status === 'in_transit').length}
+              </div>
+              <div className="text-sm text-gray-600">In Transit</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-purple-600">
+                {packages.filter(p => p.status === 'out_for_delivery').length}
+              </div>
+              <div className="text-sm text-gray-600">Out for Delivery</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-600">
+                {packages.filter(p => p.status === 'delivered').length}
+              </div>
+              <div className="text-sm text-gray-600">Delivered</div>
             </div>
           </div>
-        </CardHeader>
-        
-        <CardContent>
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">All Packages</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="delivered">Delivered</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all" className="mt-0">
-              <div className="rounded-md border">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tracking #</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From/To</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Location</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredPackages.map((pkg) => (
-                        <tr key={pkg.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{pkg.id}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.trackingNumber}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pkg.customer}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex flex-col">
-                              <span className="text-xs text-gray-500">From: {pkg.from}</span>
-                              <span className="text-xs text-gray-500">To: {pkg.to}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4 text-gray-400" />
-                              <span>{pkg.location}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(pkg.status)}`}>
-                              {pkg.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4 text-gray-400" />
-                              <span>{pkg.date}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex items-center gap-2">
-                              <Button asChild variant="outline" size="sm">
-                                <Link to={`/admin/packages/${pkg.id}`}>
-                                  <PackageIcon className="h-4 w-4 mr-1" />
-                                  Details
-                                </Link>
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Truck className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                {filteredPackages.length === 0 && (
-                  <div className="text-center py-6 text-gray-500">
-                    No packages found matching your search criteria
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="active" className="mt-0">
-              <div className="text-center py-6 text-gray-500">
-                Active packages will be shown here
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="delivered" className="mt-0">
-              <div className="text-center py-6 text-gray-500">
-                Delivered packages will be shown here
-              </div>
-            </TabsContent>
-          </Tabs>
         </CardContent>
       </Card>
     </div>
   );
-};
-
-export default PackagesPage;
+}

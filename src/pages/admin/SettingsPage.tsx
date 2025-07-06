@@ -33,8 +33,8 @@ import {
 import { toast } from "sonner";
 
 const SettingsPage = () => {
-  const [siteName, setSiteName] = useState("Swift Mail Service");
-  const [supportEmail, setSupportEmail] = useState("support@swiftmail.com");
+  const [siteName, setSiteName] = useState("Jet Delivery");
+  const [supportEmail, setSupportEmail] = useState("support@jetdelivery.com");
   const [phoneNumber, setPhoneNumber] = useState("+1 (555) 123-4567");
   const [address, setAddress] = useState("123 Main St, Anytown, USA");
   const [mapApiKey, setMapApiKey] = useState("AIzaSyD7RZd5JPiPBmV8A14TP2oQ3YQSXtzTqgA");
@@ -102,7 +102,7 @@ const SettingsPage = () => {
                 </label>
                 <Input
                   id="siteName"
-                  placeholder="Swift Mail Service"
+                  placeholder="Jet Delivery"
                   value={siteName}
                   onChange={(e) => setSiteName(e.target.value)}
                 />
@@ -115,7 +115,7 @@ const SettingsPage = () => {
                 <Input
                   id="supportEmail"
                   type="email"
-                  placeholder="support@swiftmail.com"
+                  placeholder="support@jetdelivery.com"
                   value={supportEmail}
                   onChange={(e) => setSupportEmail(e.target.value)}
                 />

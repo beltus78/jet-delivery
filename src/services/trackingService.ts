@@ -1,8 +1,10 @@
 import { TrackingEvent } from "@/components/TrackingTimeline";
 import { TrackingDetailsType } from "@/components/TrackingOverview";
 import { TrackingPoint } from "@/types/tracking";
+import { PackageService } from "./packageService";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock locations for packages
+// Mock locations for packages (fallback)
 const locations = {
   origin: { 
     id: "origin",
@@ -24,7 +26,7 @@ const locations = {
   },
 };
 
-// Mock events for a package in transit
+// Mock events for a package in transit (fallback)
 const inTransitEvents: TrackingEvent[] = [
   {
     id: "evt-1",
@@ -73,7 +75,7 @@ const inTransitEvents: TrackingEvent[] = [
   },
 ];
 
-// Mock events for a delivered package
+// Mock events for a delivered package (fallback)
 const deliveredEvents: TrackingEvent[] = [
   {
     id: "evt-1",
@@ -122,7 +124,7 @@ const deliveredEvents: TrackingEvent[] = [
   },
 ];
 
-// Mock tracking details
+// Mock tracking details (fallback)
 const mockTrackingDetails: Record<string, TrackingDetailsType> = {
   "SMS123456789": {
     trackingNumber: "SMS123456789",
@@ -205,11 +207,11 @@ const mockTrackingDetails: Record<string, TrackingDetailsType> = {
     to: {
       name: "Emily Johnson",
       email: "emily.johnson@example.com",
-      phone: "(303) 555-9876",
+      phone: "(312) 555-5678",
       address: "5678 Oak Ave",
-      city: "Denver",
-      state: "CO",
-      zip: "80239",
+      city: "Chicago",
+      state: "IL",
+      zip: "60601",
       country: "United States",
     },
     progress: 100,
@@ -218,6 +220,7 @@ const mockTrackingDetails: Record<string, TrackingDetailsType> = {
     itemCount: 1,
     packageType: "Envelope",
     signatureRequired: false,
+    specialInstructions: "",
   },
 };
 
@@ -235,105 +238,183 @@ const specialInstructions = [
   "Do not leave unattended"
 ];
 
+// Convert database package to tracking details format
+const convertPackageToTrackingDetails = (pkg: any): TrackingDetailsType => {
+  const isDelivered = pkg.status === 'delivered';
+  const progress = isDelivered ? 100 : 
+    pkg.status === 'out_for_delivery' ? 90 :
+    pkg.status === 'in_transit' ? 60 :
+    pkg.status === 'picked_up' ? 30 : 10;
+
+  return {
+    trackingNumber: pkg.tracking_number,
+    status: pkg.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    estimatedDelivery: pkg.estimated_delivery_date ? new Date(pkg.estimated_delivery_date).toLocaleDateString() : 'TBD',
+    shippedDate: new Date(pkg.created_at).toLocaleDateString(),
+    service: pkg.weight && pkg.weight > 10 ? "Express Delivery" : "Standard Shipping",
+    weight: pkg.weight ? `${pkg.weight} ${pkg.weight > 10 ? 'lbs' : 'g'}` : 'N/A',
+    from: {
+      address: pkg.origin_address,
+      city: pkg.origin_city,
+      state: pkg.origin_state || '',
+      zip: pkg.origin_postal_code || '',
+      country: pkg.origin_country,
+    },
+    to: {
+      name: pkg.customer?.first_name && pkg.customer?.last_name ? 
+        `${pkg.customer.first_name} ${pkg.customer.last_name}` : 'Recipient',
+      email: pkg.customer?.email || 'N/A',
+      phone: pkg.customer?.phone || 'N/A',
+      address: pkg.destination_address,
+      city: pkg.destination_city,
+      state: pkg.destination_state || '',
+      zip: pkg.destination_postal_code || '',
+      country: pkg.destination_country,
+    },
+    progress,
+    isDelivered,
+    priority: pkg.weight && pkg.weight > 10 ? "express" : "standard",
+    itemCount: 1,
+    packageType: pkg.weight && pkg.weight > 10 ? "Box" : "Document",
+    signatureRequired: pkg.weight && pkg.weight > 10,
+    specialInstructions: "",
+  };
+};
+
+// Convert database events to tracking events format
+const convertEventsToTrackingEvents = (events: any[]): TrackingEvent[] => {
+  return events.map((event, index) => ({
+    id: event.id,
+    status: event.event_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    location: event.location || 'Unknown Location',
+    timestamp: event.created_at,
+    description: event.description,
+    isCompleted: index < events.length - 1,
+    isCurrentEvent: index === events.length - 1,
+  }));
+};
+
 // Function to get tracking details
-export const getTrackingDetails = (trackingNumber: string): Promise<TrackingDetailsType> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const details = mockTrackingDetails[trackingNumber];
-      if (details) {
-        resolve(details);
-      } else {
-        // If tracking number doesn't exist in our mock data, create a random one
-        const isDelivered = Math.random() > 0.5;
-        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const emailDomain = emailDomains[Math.floor(Math.random() * emailDomains.length)];
-        const packageType = packageTypes[Math.floor(Math.random() * packageTypes.length)];
-        const hasSpecialInstructions = Math.random() > 0.7;
-        const priorityOptions = ["standard", "express", "priority"] as const;
-        const priority = priorityOptions[Math.floor(Math.random() * priorityOptions.length)];
-        const signatureRequired = Math.random() > 0.5;
-        const itemCount = Math.floor(Math.random() * 5) + 1;
-        
-        const newDetails: TrackingDetailsType = {
-          trackingNumber,
-          status: isDelivered ? "Delivered" : "In Transit",
-          estimatedDelivery: isDelivered ? "Sep 12, 2023" : "Sep 17, 2023",
-          shippedDate: isDelivered ? "Sep 10, 2023" : "Sep 15, 2023",
-          service: Math.random() > 0.5 ? "Express Delivery" : "Standard Shipping",
-          weight: `${(1 + Math.random() * 5).toFixed(1)} lbs`,
-          from: {
-            address: "16000 Dallas Pkwy # 400",
-            city: "Dallas",
-            state: "TX",
-            zip: "75248",
-            country: "United States",
-          },
-          to: {
-            name: `${firstName} ${lastName}`,
-            email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${emailDomain}`,
-            phone: `(${Math.floor(Math.random() * 800) + 200}) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
-            address: `${Math.floor(1000 + Math.random() * 8999)} ${["Main St", "Broadway", "Oak Ave", "Elm St"][Math.floor(Math.random() * 4)]}`,
-            city: "Denver",
-            state: "CO",
-            zip: "80202",
-            country: "United States",
-          },
-          progress: isDelivered ? 100 : Math.floor(Math.random() * 80) + 10,
-          isDelivered,
-          priority,
-          itemCount,
-          packageType,
-          signatureRequired,
-          ...(hasSpecialInstructions && {
-            specialInstructions: specialInstructions[Math.floor(Math.random() * specialInstructions.length)]
-          })
-        };
-        resolve(newDetails);
-      }
-    }, 800); // Simulate network delay
-  });
+export const getTrackingDetails = async (trackingNumber: string): Promise<TrackingDetailsType> => {
+  try {
+    // Try to get from database first
+    const packageData = await PackageService.getPackageByTrackingNumber(trackingNumber);
+    
+    if (packageData) {
+      return convertPackageToTrackingDetails(packageData);
+    }
+
+    // Fallback to mock data
+    const mockData = mockTrackingDetails[trackingNumber];
+    if (mockData) {
+      return mockData;
+    }
+
+    throw new Error('Tracking number not found');
+  } catch (error) {
+    console.error('Error fetching tracking details:', error);
+    
+    // Return mock data as fallback
+    const mockData = mockTrackingDetails[trackingNumber];
+    if (mockData) {
+      return mockData;
+    }
+    
+    throw error;
+  }
 };
 
 // Function to get tracking events
-export const getTrackingEvents = (trackingNumber: string): Promise<TrackingEvent[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const details = mockTrackingDetails[trackingNumber];
-      if (details && details.isDelivered) {
-        resolve(deliveredEvents);
-      } else {
-        resolve(inTransitEvents);
-      }
-    }, 1000); // Simulate network delay
-  });
+export const getTrackingEvents = async (trackingNumber: string): Promise<TrackingEvent[]> => {
+  try {
+    // Try to get from database first
+    const packageData = await PackageService.getPackageByTrackingNumber(trackingNumber);
+    
+    if (packageData && packageData.tracking_events) {
+      return convertEventsToTrackingEvents(packageData.tracking_events);
+    }
+
+    // Fallback to mock data
+    const mockData = mockTrackingDetails[trackingNumber];
+    if (mockData) {
+      return mockData.isDelivered ? deliveredEvents : inTransitEvents;
+    }
+
+    throw new Error('Tracking events not found');
+  } catch (error) {
+    console.error('Error fetching tracking events:', error);
+    
+    // Return mock data as fallback
+    const mockData = mockTrackingDetails[trackingNumber];
+    if (mockData) {
+      return mockData.isDelivered ? deliveredEvents : inTransitEvents;
+    }
+    
+    throw error;
+  }
 };
 
 // Function to get tracking map data
-export const getTrackingMapData = (trackingNumber: string): Promise<{
+export const getTrackingMapData = async (trackingNumber: string): Promise<{
   origin: TrackingPoint;
   destination: TrackingPoint;
   currentLocation: TrackingPoint;
   isDelivered: boolean;
 }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const details = mockTrackingDetails[trackingNumber];
-      if (details && details.isDelivered) {
-        resolve({
-          origin: locations.origin,
-          destination: locations.destination,
-          currentLocation: locations.destination,
-          isDelivered: true,
-        });
-      } else {
-        resolve({
-          origin: locations.origin,
-          destination: locations.destination,
-          currentLocation: locations.current,
-          isDelivered: false,
-        });
-      }
-    }, 1200); // Simulate network delay
-  });
+  try {
+    // Try to get from database first
+    const packageData = await PackageService.getPackageByTrackingNumber(trackingNumber);
+    
+    if (packageData) {
+      return {
+        origin: {
+          id: "origin",
+          lat: packageData.origin_lat || 32.9481,
+          lng: packageData.origin_lng || -96.7591,
+          label: `${packageData.origin_city}, ${packageData.origin_state || ''}`
+        },
+        destination: {
+          id: "destination",
+          lat: packageData.destination_lat || 39.7392,
+          lng: packageData.destination_lng || -104.9903,
+          label: `${packageData.destination_city}, ${packageData.destination_state || ''}`
+        },
+        currentLocation: {
+          id: "current",
+          lat: packageData.current_lat || packageData.origin_lat || 32.9481,
+          lng: packageData.current_lng || packageData.origin_lng || -96.7591,
+          label: packageData.current_location || packageData.origin_city
+        },
+        isDelivered: packageData.status === 'delivered'
+      };
+    }
+
+    // Fallback to mock data
+    const mockData = mockTrackingDetails[trackingNumber];
+    if (mockData) {
+      return {
+        origin: locations.origin,
+        destination: locations.destination,
+        currentLocation: locations.current,
+        isDelivered: mockData.isDelivered
+      };
+    }
+
+    throw new Error('Tracking map data not found');
+  } catch (error) {
+    console.error('Error fetching tracking map data:', error);
+    
+    // Return mock data as fallback
+    const mockData = mockTrackingDetails[trackingNumber];
+    if (mockData) {
+      return {
+        origin: locations.origin,
+        destination: locations.destination,
+        currentLocation: locations.current,
+        isDelivered: mockData.isDelivered
+      };
+    }
+    
+    throw error;
+  }
 };

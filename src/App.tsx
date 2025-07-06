@@ -1,63 +1,106 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import TrackPage from "./pages/TrackPage";
-import TrackingDetailsPage from "./pages/TrackingDetailsPage";
-import ServicesPage from "./pages/ServicesPage";
-import ContactPage from "./pages/ContactPage";
-import LoginPage from "./pages/LoginPage";
-import { AdminLayout } from "./components/admin/AdminLayout";
-import AdminDashboard from "./pages/AdminDashboard";
-import PackagesPage from "./pages/admin/PackagesPage";
-import PackageDetails from "./pages/admin/PackageDetails";
-import DeliveriesPage from "./pages/admin/DeliveriesPage";
-import CustomersPage from "./pages/admin/CustomersPage";
-import ReportsPage from "./pages/admin/ReportsPage";
-import SettingsPage from "./pages/admin/SettingsPage";
-import UserManagementPage from "./pages/admin/UserManagementPage";
+// Public Pages
+import Index from "@/pages/Index";
+import LoginPage from "@/pages/LoginPage";
+import ContactPage from "@/pages/ContactPage";
+import ServicesPage from "@/pages/ServicesPage";
+import TrackPage from "@/pages/TrackPage";
+import TrackingDetailsPage from "@/pages/TrackingDetailsPage";
+import NotFound from "@/pages/NotFound";
 
-const queryClient = new QueryClient();
+// Admin Pages
+import Dashboard from "@/pages/admin/Dashboard";
+import PackagesPage from "@/pages/admin/PackagesPage";
+import CreatePackagePage from "@/pages/admin/CreatePackagePage";
+import PackageDetailsPage from "@/pages/admin/PackageDetailsPage";
+import CustomersPage from "@/pages/admin/CustomersPage";
+import DeliveriesPage from "@/pages/admin/DeliveriesPage";
+import ReportsPage from "@/pages/admin/ReportsPage";
+import SettingsPage from "@/pages/admin/SettingsPage";
+import UserManagementPage from "@/pages/admin/UserManagementPage";
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
+// Protected Route Component
+function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) {
+  const { user, loading, requireAuth } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-swift-700"></div>
+      </div>
+    );
+  }
+
+  if (!requireAuth(requiredRole)) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Admin Routes Component
+function AdminRoutes() {
+  const { user } = useAuth();
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <AdminLayout>
+      <Routes>
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/packages" element={<PackagesPage />} />
+        <Route path="/admin/packages/new" element={<CreatePackagePage />} />
+        <Route path="/admin/packages/:id" element={<PackageDetailsPage />} />
+        <Route path="/admin/packages/:id/edit" element={<CreatePackagePage />} />
+        <Route path="/admin/customers" element={<CustomersPage />} />
+        <Route path="/admin/deliveries" element={<DeliveriesPage />} />
+        <Route path="/admin/reports" element={<ReportsPage />} />
+        <Route path="/admin/settings" element={<SettingsPage />} />
+        <Route path="/admin/users" element={<UserManagementPage />} />
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      </Routes>
+    </AdminLayout>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/track" element={<TrackPage />} />
-            <Route path="/track/:trackingNumber" element={<TrackingDetailsPage />} />
-            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/contact" element={<ContactPage />} />
-          </Route>
-          <Route path="/login" element={<LoginPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/track" element={<TrackPage />} />
+            <Route path="/tracking/:trackingNumber" element={<TrackingDetailsPage />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="packages" element={<PackagesPage />} />
-            <Route path="packages/:id" element={<PackageDetails />} />
-            <Route path="deliveries" element={<DeliveriesPage />} />
-            <Route path="customers" element={<CustomersPage />} />
-            <Route path="reports" element={<ReportsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="users" element={<UserManagementPage />} />
-          </Route>
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+          <Toaster 
+            position="top-right"
+            richColors
+            closeButton
+            duration={4000}
+          />
+        </div>
+      </Router>
+    </AuthProvider>
+  );
+}
 
 export default App;
