@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { 
   Users, 
   Search, 
@@ -118,16 +119,9 @@ const CustomersPage = () => {
   const [customers, setCustomers] = useState(initialCustomers);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | undefined>(undefined);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentCustomer, setCurrentCustomer] = useState<any>(null);
-  const [newCustomer, setNewCustomer] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-  });
 
   // Filter customers based on search query and filters
   const filteredCustomers = customers.filter((customer) => {
@@ -141,48 +135,6 @@ const CustomersPage = () => {
     
     return matchesSearch && matchesStatusFilter;
   });
-
-  // Handle form input changes for new customer
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewCustomer((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Handle adding a new customer
-  const handleAddCustomer = () => {
-    // Validate form
-    if (!newCustomer.name || !newCustomer.email || !newCustomer.phone || !newCustomer.address) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    // Add new customer
-    const newId = Math.max(...customers.map((customer) => customer.id)) + 1;
-    
-    const customerToAdd = {
-      id: newId,
-      name: newCustomer.name,
-      email: newCustomer.email,
-      phone: newCustomer.phone,
-      address: newCustomer.address,
-      orders: 0,
-      lastOrder: new Date().toISOString().split('T')[0],
-      status: "Active",
-    };
-    
-    setCustomers([...customers, customerToAdd]);
-    toast.success(`Customer ${newCustomer.name} has been added successfully`);
-    
-    // Reset form and close dialog
-    setNewCustomer({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-    });
-    
-    setIsAddDialogOpen(false);
-  };
 
   // Handle editing a customer
   const handleEditCustomer = () => {
@@ -245,86 +197,11 @@ const CustomersPage = () => {
         </div>
         
         <div className="flex gap-2">
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2 bg-swift-700 hover:bg-swift-800">
-                <Plus className="h-4 w-4" /> Add Customer
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Add New Customer</DialogTitle>
-                <DialogDescription>
-                  Create a new customer account and add their contact information.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">
-                    Full Name
-                  </label>
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="John Doe"
-                    value={newCustomer.name}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Email Address
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="john.doe@example.com"
-                    value={newCustomer.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">
-                    Phone Number
-                  </label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="123-456-7890"
-                    value={newCustomer.phone}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="address" className="text-sm font-medium">
-                    Address
-                  </label>
-                  <Input
-                    id="address"
-                    name="address"
-                    placeholder="123 Main St, Anytown"
-                    value={newCustomer.address}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button className="bg-swift-700 hover:bg-swift-800" onClick={handleAddCustomer}>
-                  Add Customer
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button asChild className="gap-2 bg-swift-700 hover:bg-swift-800">
+            <Link to="/admin/customers/new">
+              <Plus className="h-4 w-4" /> Add Customer
+            </Link>
+          </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

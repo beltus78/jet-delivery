@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { 
   Package, 
   User, 
@@ -87,7 +87,7 @@ export default function CreatePackagePage() {
 
   const loadCustomers = async () => {
     try {
-      const data = await CustomerService.getAllCustomers();
+      const data = await CustomerService.getCustomers();
       setCustomers(data);
     } catch (error) {
       console.error('Error loading customers:', error);

@@ -23,7 +23,7 @@ export interface PackageWithEvents extends Package {
 export class PackageService {
   // Get all packages with optional filters
   static async getPackages(filters?: {
-    status?: string;
+    status?: Database['public']['Enums']['package_status'];
     customer_id?: string;
     limit?: number;
     offset?: number;
@@ -170,9 +170,9 @@ export class PackageService {
   }
 
   // Update package status
-  static async updatePackageStatus(id: string, status: string, location?: string): Promise<Package> {
+  static async updatePackageStatus(id: string, status: Database['public']['Enums']['package_status'], location?: string): Promise<Package> {
     try {
-      const updates: PackageUpdate = { status: status as any };
+      const updates: PackageUpdate = { status };
       
       if (location) {
         updates.current_location = location;
@@ -183,7 +183,7 @@ export class PackageService {
       // Create tracking event for status change
       await this.createTrackingEvent({
         package_id: id,
-        event_type: status as any,
+        event_type: status as Database['public']['Enums']['tracking_event_type'],
         description: `Package status updated to ${status}`,
         location: location || packageData.current_location,
         lat: packageData.current_lat,
@@ -309,5 +309,13 @@ export class PackageService {
       console.error('Get package stats error:', error);
       throw error;
     }
+  }
+
+  // Generate tracking number
+  static async generateTrackingNumber(): Promise<string> {
+    const prefix = 'JET';
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `${prefix}${timestamp}${random}`;
   }
 } 
