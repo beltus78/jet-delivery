@@ -33,7 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { PackageService } from "@/services/packageService";
 import { TrackingService } from "@/services/trackingService";
-import { useAuth } from "@/hooks/useAuth";
+
 
 interface TrackingEvent {
   id: string;
@@ -83,7 +83,7 @@ interface PackageWithEvents {
 export default function PackageDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+
   const [packageData, setPackageData] = useState<PackageWithEvents | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

@@ -27,7 +27,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { PackageService } from "@/services/packageService";
 import { CustomerService } from "@/services/customerService";
-import { useAuth } from "@/hooks/useAuth";
+
 
 interface PackageWithCustomer {
   id: string;
@@ -52,7 +52,6 @@ interface PackageWithCustomer {
 }
 
 export default function PackagesPage() {
-  const { user } = useAuth();
   const [packages, setPackages] = useState<PackageWithCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

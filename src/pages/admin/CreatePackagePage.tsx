@@ -22,7 +22,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { PackageService } from "@/services/packageService";
 import { CustomerService } from "@/services/customerService";
-import { useAuth } from "@/hooks/useAuth";
+
 
 interface Customer {
   id: string;
@@ -56,7 +56,6 @@ interface PackageFormData {
 }
 
 export default function CreatePackagePage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);

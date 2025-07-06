@@ -30,8 +30,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { PackageService } from "@/services/packageService";
 import { CustomerService } from "@/services/customerService";
-import { AuthService } from "@/services/authService";
-import { useAuth } from "@/hooks/useAuth";
 
 interface DashboardStats {
   totalPackages: number;
@@ -56,7 +54,6 @@ interface RecentPackage {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats>({
     totalPackages: 0,
     activePackages: 0,
@@ -81,8 +78,8 @@ export default function Dashboard() {
       setLoading(true);
       
       // Load packages for stats
-      const packages = await PackageService.getAllPackages();
-      const customers = await CustomerService.getAllCustomers();
+      const packages = await PackageService.getPackages();
+      const customers = await CustomerService.getCustomers();
       
       // Calculate stats
       const totalPackages = packages.length;
@@ -187,7 +184,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Welcome back, {user?.first_name || 'Admin'}!
+            Welcome back, Admin!
           </h1>
           <p className="text-gray-600">
             Here's what's happening with your shipments today.

@@ -65,7 +65,7 @@ const initialUsers = [
             email: "admin@jetdelivery.com",
     role: "Admin",
     status: "Active",
-    lastLogin: "2023-09-15 09:30:00",
+
     permissions: ["all"],
   },
   {
@@ -74,7 +74,7 @@ const initialUsers = [
             email: "sarah@jetdelivery.com",
     role: "Manager",
     status: "Active",
-    lastLogin: "2023-09-15 11:20:00",
+
     permissions: ["packages", "deliveries", "customers"],
   },
   {
@@ -83,7 +83,7 @@ const initialUsers = [
             email: "john@jetdelivery.com",
     role: "Operator",
     status: "Active",
-    lastLogin: "2023-09-14 16:45:00",
+
     permissions: ["packages", "deliveries"],
   },
   {
@@ -92,7 +92,7 @@ const initialUsers = [
             email: "emily@jetdelivery.com",
     role: "Agent",
     status: "Inactive",
-    lastLogin: "2023-09-10 08:15:00",
+
     permissions: ["customers"],
   },
   {
@@ -101,7 +101,7 @@ const initialUsers = [
             email: "michael@jetdelivery.com",
     role: "Viewer",
     status: "Active",
-    lastLogin: "2023-09-13 14:30:00",
+
     permissions: ["view"],
   },
 ];
@@ -193,7 +193,7 @@ const UserManagementPage = () => {
       email: newUser.email,
       role: newUser.role,
       status: "Active",
-      lastLogin: currentDate,
+
       permissions: newUser.role === "Admin" ? ["all"] : ["view"],
     };
     
@@ -470,14 +470,14 @@ const UserManagementPage = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Last Login</TableHead>
+
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                    <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                       No users found. Try adjusting your search or filters.
                     </TableCell>
                   </TableRow>
@@ -503,7 +503,7 @@ const UserManagementPage = () => {
                           {user.status}
                         </span>
                       </TableCell>
-                      <TableCell>{user.lastLogin}</TableCell>
+
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button

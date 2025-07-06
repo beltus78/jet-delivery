@@ -4,8 +4,6 @@ import {
   Globe, 
   Mail, 
   Bell, 
-  Shield, 
-  Lock, 
   CreditCard, 
   Clock, 
   Truck, 
@@ -42,7 +40,7 @@ const SettingsPage = () => {
   const [taxRate, setTaxRate] = useState("0.05");
   const [timezone, setTimezone] = useState("America/Los_Angeles");
   const [enableNotifications, setEnableNotifications] = useState(true);
-  const [enable2FA, setEnable2FA] = useState(false);
+
   const [automaticUpdates, setAutomaticUpdates] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -85,7 +83,7 @@ const SettingsPage = () => {
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="localization">Localization</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
+
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
         
@@ -260,37 +258,7 @@ const SettingsPage = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="security" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage password policies and authentication methods</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label htmlFor="enable2FA" className="text-sm font-medium">
-                  Enable Two-Factor Authentication
-                </label>
-                <Switch
-                  id="enable2FA"
-                  checked={enable2FA}
-                  onCheckedChange={(checked) => setEnable2FA(checked)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="passwordPolicy" className="text-sm font-medium">
-                  Password Policy
-                </label>
-                <Input
-                  id="passwordPolicy"
-                  type="password"
-                  placeholder="••••••••"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+
         
         <TabsContent value="advanced" className="space-y-4">
           <Card>

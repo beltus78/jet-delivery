@@ -1,13 +1,11 @@
-
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet } from "react-router-dom";
 import { 
   Package, 
   Truck, 
   Users, 
   BarChart3, 
   Settings, 
-  LogOut, 
   Search, 
   Bell,
   Menu,
@@ -28,7 +26,6 @@ export const AdminLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(3);
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Check if screen is mobile on initial render and when window is resized
   useEffect(() => {
@@ -52,13 +49,6 @@ export const AdminLayout = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
-  };
-
-  const handleLogout = () => {
-    toast.info("Logging out...");
-    setTimeout(() => {
-      navigate("/login");
-    }, 1000);
   };
 
   const handleViewNotifications = () => {
@@ -192,17 +182,6 @@ export const AdminLayout = () => {
           </div>
           
           <div className="p-4 border-t">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-gray-600"
-              onClick={handleLogout}
-            >
-              <div className="flex items-center gap-2">
-                <LogOut className="h-5 w-5" />
-                <span>Logout</span>
-              </div>
-            </Button>
-            
             <div className="mt-8 px-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <HelpCircle className="h-4 w-4" />
