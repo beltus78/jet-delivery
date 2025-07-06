@@ -199,9 +199,9 @@ const CustomersPage = () => {
         <div className="flex gap-2">
           <Button asChild className="gap-2 bg-swift-700 hover:bg-swift-800">
             <Link to="/admin/customers/new">
-              <Plus className="h-4 w-4" /> Add Customer
+                <Plus className="h-4 w-4" /> Add Customer
             </Link>
-          </Button>
+                </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
