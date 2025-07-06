@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import Layout from "@/components/Layout";
 
 // Public Pages
 import Index from "@/pages/Index";
@@ -76,13 +77,15 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/track" element={<TrackPage />} />
-            <Route path="/tracking/:trackingNumber" element={<TrackingDetailsPage />} />
+            {/* Public Routes with Layout */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/track" element={<TrackPage />} />
+              <Route path="/tracking/:trackingNumber" element={<TrackingDetailsPage />} />
+            </Route>
             
             {/* Admin Routes */}
             <Route path="/admin/*" element={<AdminRoutes />} />

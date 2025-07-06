@@ -48,8 +48,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const currentUser = await AuthService.getCurrentUser();
       setUser(currentUser);
-    } catch (error) {
-      console.error('Error checking user:', error);
+    } catch (error: any) {
+      // Don't log errors for missing sessions (normal case)
+      if (!error.message?.includes('Auth session missing')) {
+        console.error('Error checking user:', error);
+      }
       setUser(null);
     } finally {
       setLoading(false);

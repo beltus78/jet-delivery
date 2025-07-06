@@ -75,6 +75,10 @@ export class AuthService {
       const { data: { user }, error } = await supabase.auth.getUser();
       
       if (error) {
+        // Don't throw error for missing session, just return null
+        if (error.message.includes('Auth session missing')) {
+          return null;
+        }
         throw new Error(error.message);
       }
 
