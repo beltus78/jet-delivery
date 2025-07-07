@@ -25,20 +25,20 @@ import UserManagementPage from "@/pages/admin/UserManagementPage";
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* Public Routes with Layout */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/track" element={<TrackPage />} />
+      <Router>
+        <div className="App">
+          <Routes>
+            {/* Public Routes with Layout */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/track" element={<TrackPage />} />
             <Route path="/track/:trackingNumber" element={<TrackingDetailsPage />} />
-            <Route path="/tracking/:trackingNumber" element={<TrackingDetailsPage />} />
-          </Route>
-          
-          {/* Admin Routes */}
+              <Route path="/tracking/:trackingNumber" element={<TrackingDetailsPage />} />
+            </Route>
+            
+            {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="packages" element={<PackagesPage />} />
@@ -66,19 +66,19 @@ function App() {
           <Route path="/admin/reports" element={<ReportsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
           <Route path="/admin/users" element={<UserManagementPage />} />
+            
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
-        <Toaster 
-          position="top-right"
-          richColors
-          closeButton
-          duration={4000}
-        />
-      </div>
-    </Router>
+          <Toaster 
+            position="top-right"
+            richColors
+            closeButton
+            duration={4000}
+          />
+        </div>
+      </Router>
   );
 }
 
